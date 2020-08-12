@@ -2339,5 +2339,7 @@
     "Esc": "Esc",
     "Enter": "Enter",
     "Space": "Space",
-    "End": "End"
+    "End": "End",
+    "Meetings": "Meetings",
+    "Meeting History": "Meeting History"
 }

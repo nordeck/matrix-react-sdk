@@ -95,6 +95,11 @@ limitations under the License.
     mask-position: center;
 }
 
+.mx_RightPanel_meetingsButton::before {
+    mask-image: url('$(res)/img/element-icons/room/meetings.svg');
+    mask-position: center;
+}
+
 .mx_RightPanel_headerButton_highlight {
     background: rgba($accent-color, 0.25);
     // make the icon the accent color too

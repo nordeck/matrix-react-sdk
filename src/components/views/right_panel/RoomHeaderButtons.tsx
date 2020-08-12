@@ -79,6 +79,11 @@ export default class RoomHeaderButtons extends HeaderButtons {
         this.setPhase(RightPanelPhases.NotificationPanel);
     }
 
+    private onMeetingsClicked() {
+        // This toggles for us, if needed
+        this.setPhase(RightPanelPhases.MeetingPanel);
+    }
+
     public renderButtons() {
         return [
             <HeaderButton key="membersButton" name="membersButton"
@@ -99,6 +104,12 @@ export default class RoomHeaderButtons extends HeaderButtons {
                 onClick={this.onNotificationsClicked}
                 analytics={['Right Panel', 'Notification List Button', 'click']}
             />,
+            <HeaderButton key="meetingsButton" name="meetingsButton"
+                title={_t('Meetings')}
+                isHighlighted={this.isPhase(RightPanelPhases.MeetingPanel)}
+                onClick={this.onMeetingsClicked}
+                analytics={['Right Panel', 'Meeting History Button', 'click']}
+            />
         ];
     }
 }

@@ -586,4 +586,9 @@ export const SETTINGS: {[setting: string]: ISetting} = {
         displayName: _td("Enable experimental, compact IRC style layout"),
         default: false,
     },
+    "showMeetingPanelButton": {
+        supportedLevels: LEVELS_ROOM_SETTINGS,
+        displayName: _td("mx.setting.rightPanel.showMeetingsTab"),
+        default: true,
+    },
 };

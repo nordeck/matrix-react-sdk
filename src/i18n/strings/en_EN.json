@@ -2340,6 +2340,7 @@
     "Enter": "Enter",
     "Space": "Space",
     "End": "End",
-    "Meetings": "Meetings",
-    "Meeting History": "Meeting History"
+    "mx.interface.rightPanel.meetingTabButton.label": "Meetings",
+    "mx.interface.rightPanel.meetingTab.title": "Meeting History",
+    "mx.setting.rightPanel.showMeetingsTab": "Show/Hide Button that shows the Meetings Tab in the Right Panel"
 }

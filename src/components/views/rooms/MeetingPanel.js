@@ -16,7 +16,7 @@ export default class MeetingPanel extends React.Component {
     }
 
     render() {
-        const title = <div className="mx_MeetingPanel_title">{_t("Meeting History")}</div>;
+        const title = <div className="mx_MeetingPanel_title">{_t("mx.interface.rightPanel.meetingTab.title")}</div>;
         if (this.state.loading) {
             return (
                 <div className="mx_MeetingPanel" role="tabpanel">

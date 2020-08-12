@@ -25,6 +25,8 @@ import HeaderButtons, {HeaderKind} from './HeaderButtons';
 import {RightPanelPhases} from "../../../stores/RightPanelStorePhases";
 import {Action} from "../../../dispatcher/actions";
 import {ActionPayload} from "../../../dispatcher/payloads";
+import SettingsStore from "../../../settings/SettingsStore";
+
 
 const MEMBER_PHASES = [
     RightPanelPhases.RoomMemberList,
@@ -85,6 +87,14 @@ export default class RoomHeaderButtons extends HeaderButtons {
     }
 
     public renderButtons() {
+        const meetingPanelButton = SettingsStore.getValue('showMeetingPanelButton')
+            ? <HeaderButton key="meetingsButton" name="meetingsButton"
+                title={_t('mx.interface.rightPanel.meetingTabButton.label')}
+                isHighlighted={this.isPhase(RightPanelPhases.MeetingPanel)}
+                onClick={this.onMeetingsClicked}
+                analytics={['Right Panel', 'Meeting History Button', 'click']} />
+            : null;
+
         return [
             <HeaderButton key="membersButton" name="membersButton"
                 title={_t('Members')}
@@ -104,12 +114,7 @@ export default class RoomHeaderButtons extends HeaderButtons {
                 onClick={this.onNotificationsClicked}
                 analytics={['Right Panel', 'Notification List Button', 'click']}
             />,
-            <HeaderButton key="meetingsButton" name="meetingsButton"
-                title={_t('Meetings')}
-                isHighlighted={this.isPhase(RightPanelPhases.MeetingPanel)}
-                onClick={this.onMeetingsClicked}
-                analytics={['Right Panel', 'Meeting History Button', 'click']}
-            />
+            meetingPanelButton,
         ];
     }
 }

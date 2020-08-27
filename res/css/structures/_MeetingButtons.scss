@@ -1,0 +1,13 @@
+.mx_MeetingButtonContainer {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.mx_MeetingButton {
+    border-radius: 6px;
+    border: none;
+    padding: 0.5rem 2rem;
+    background-color: #0099ff;
+    color: white;
+}

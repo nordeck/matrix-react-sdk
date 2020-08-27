@@ -86,7 +86,7 @@ export default class RoomHeaderButtons extends HeaderButtons {
     public renderButtons() {
         const meetingPanelButton = SettingsStore.getValue('showMeetingPanelButton')
             ? <HeaderButton key="meetingsButton" name="meetingsButton"
-                title={_t('mx.interface.rightPanel.meetingTabButton.label')}
+                title={_t('Meetings')}
                 isHighlighted={this.isPhase(RightPanelPhases.MeetingPanel)}
                 onClick={this.onMeetingsClicked}
                 analytics={['Right Panel', 'Meeting History Button', 'click']} />

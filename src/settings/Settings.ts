@@ -600,7 +600,7 @@ export const SETTINGS: {[setting: string]: ISetting} = {
     },
     "showMeetingPanelButton": {
         supportedLevels: LEVELS_ROOM_SETTINGS,
-        displayName: _td("mx.setting.rightPanel.showMeetingsTab"),
+        displayName: _td("Show/Hide Button that shows the Meetings Tab in the Right Panel"),
         default: true,
     },
 };

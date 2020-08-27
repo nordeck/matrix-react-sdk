@@ -505,6 +505,7 @@
     "Manually verify all remote sessions": "Manually verify all remote sessions",
     "IRC display name width": "IRC display name width",
     "Enable experimental, compact IRC style layout": "Enable experimental, compact IRC style layout",
+    "Show/Hide Button that shows the Meetings Tab in the Right Panel": "Show/Hide Button that shows the Meetings Tab in the Right Panel",
     "Collecting app version information": "Collecting app version information",
     "Collecting logs": "Collecting logs",
     "Uploading logs": "Uploading logs",
@@ -1057,6 +1058,7 @@
     "Please select the destination room for this message": "Please select the destination room for this message",
     "Scroll to most recent messages": "Scroll to most recent messages",
     "Close preview": "Close preview",
+    "Meeting History": "Meeting History",
     "and %(count)s others...|other": "and %(count)s others...",
     "and %(count)s others...|one": "and one other...",
     "Invite to this room": "Invite to this room",
@@ -1278,6 +1280,7 @@
     "Yours, or the other users’ internet connection": "Yours, or the other users’ internet connection",
     "Yours, or the other users’ session": "Yours, or the other users’ session",
     "Members": "Members",
+    "Meetings": "Meetings",
     "Files": "Files",
     "Trusted": "Trusted",
     "Not trusted": "Not trusted",
@@ -1615,6 +1618,7 @@
     "Community ID": "Community ID",
     "example": "example",
     "Create": "Create",
+    "Schedule Meeting": "Schedule Meeting",
     "Please enter a name for the room": "Please enter a name for the room",
     "Set a room address to easily share your room with other people.": "Set a room address to easily share your room with other people.",
     "This room is private, and can only be joined by invitation.": "This room is private, and can only be joined by invitation.",
@@ -2333,8 +2337,5 @@
     "Esc": "Esc",
     "Enter": "Enter",
     "Space": "Space",
-    "End": "End",
-    "mx.interface.rightPanel.meetingTabButton.label": "Meetings",
-    "mx.interface.rightPanel.meetingTab.title": "Meeting History",
-    "mx.setting.rightPanel.showMeetingsTab": "Show/Hide Button that shows the Meetings Tab in the Right Panel"
+    "End": "End"
 }

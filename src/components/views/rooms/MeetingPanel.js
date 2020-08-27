@@ -1,11 +1,8 @@
 import React from "react";
-import AutoHideScrollbar from "../../structures/AutoHideScrollbar";
 import Spinner from "../elements/Spinner";
 import { _t } from '../../../languageHandler';
-
-/*
- * Component which shows the meeting history list
- */
+import MeetingButtons from "../../structures/MeetingButtons";
+import AutoHideScrollbar from "../../structures/AutoHideScrollbar";
 
 export default class MeetingPanel extends React.Component {
     constructor(props) {
@@ -16,7 +13,7 @@ export default class MeetingPanel extends React.Component {
     }
 
     render() {
-        const title = <div className="mx_MeetingPanel_title">{_t("mx.interface.rightPanel.meetingTab.title")}</div>;
+        const title = <div className="mx_MeetingPanel_title">{_t("Meeting History")}</div>;
         if (this.state.loading) {
             return (
                 <div className="mx_MeetingPanel" role="tabpanel">
@@ -30,6 +27,7 @@ export default class MeetingPanel extends React.Component {
                 <AutoHideScrollbar>
                     <div className="mx_MeetingPanel_wrapper">
                         { title }
+                        <MeetingButtons key="MeetingButtons" />
                     </div>
                 </AutoHideScrollbar>
             </div>

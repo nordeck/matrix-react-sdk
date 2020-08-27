@@ -83,11 +83,25 @@ export default createReactClass({
             localpart: this.state.groupId,
             profile: profile,
         }).then((result) => {
-            dis.dispatch({
-                action: 'view_group',
-                group_id: result.group_id,
-                group_is_new: true,
-            });
+            if (result.room_id) {
+                dis.dispatch({
+                    action: 'view_room',
+                    room_id: result.room_id,
+                });
+
+                // Ensure the tag gets selected now that we've created it
+                dis.dispatch({action: 'deselect_tags'}, true);
+                dis.dispatch({
+                    action: 'select_tag',
+                    tag: result.group_id,
+                });
+            } else {
+                dis.dispatch({
+                    action: 'view_group',
+                    group_id: result.group_id,
+                    group_is_new: true,
+                });
+            }
             this.props.onFinished(true);
         }).catch((e) => {
             this.setState({createError: e});

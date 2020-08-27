@@ -29,6 +29,8 @@ import { Droppable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 import MatrixClientContext from "../../contexts/MatrixClientContext";
 import AutoHideScrollbar from "./AutoHideScrollbar";
+import SettingsStore from "../../settings/SettingsStore";
+import UserTagTile from "../views/elements/UserTagTile";
 
 const TagPanel = createReactClass({
     displayName: 'TagPanel',
@@ -102,6 +104,17 @@ const TagPanel = createReactClass({
         dis.dispatch({action: 'deselect_tags'});
     },
 
+    renderGlobalIcon() {
+        if (!SettingsStore.getValue("feature_communities_v2_prototypes")) return null;
+
+        return (
+            <div>
+                <UserTagTile />
+                <hr className="mx_TagPanel_divider" />
+            </div>
+        );
+    },
+
     render() {
         const DNDTagTile = sdk.getComponent('elements.DNDTagTile');
         const AccessibleButton = sdk.getComponent('elements.AccessibleButton');
@@ -133,11 +146,28 @@ const TagPanel = createReactClass({
             mx_TagPanel_items_selected: itemsSelected,
         });
 
+        let createButton = (
+            <ActionButton
+                tooltip
+                label={_t("Communities")}
+                action="toggle_my_groups"
+                className="mx_TagTile mx_TagTile_plus" />
+        );
+
+        if (SettingsStore.getValue("feature_communities_v2_prototypes")) {
+            createButton = (
+                <ActionButton
+                    tooltip
+                    label={_t("Create community")}
+                    action="view_create_group"
+                    className="mx_TagTile mx_TagTile_plus" />
+            );
+        }
+
         return <div className={classes}>
             <div className="mx_TagPanel_clearButton_container">
                 { clearButton }
             </div>
-            <div className="mx_TagPanel_divider" />
             <AutoHideScrollbar
                 className="mx_TagPanel_scroller"
                 // XXX: Use onMouseDown as a workaround for https://github.com/atlassian/react-beautiful-dnd/issues/273
@@ -153,13 +183,10 @@ const TagPanel = createReactClass({
                                 className="mx_TagPanel_tagTileContainer"
                                 ref={provided.innerRef}
                             >
+                                { this.renderGlobalIcon() }
                                 { tags }
                                 <div>
-                                    <ActionButton
-                                        tooltip
-                                        label={_t("Communities")}
-                                        action="toggle_my_groups"
-                                        className="mx_TagTile mx_TagTile_plus" />
+                                    {createButton}
                                 </div>
                                 { provided.placeholder }
                             </div>

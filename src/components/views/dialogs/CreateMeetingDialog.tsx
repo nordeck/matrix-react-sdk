@@ -1,17 +1,14 @@
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import BaseDialog from '../dialogs/BaseDialog';
 import { _t } from '../../../languageHandler';
 
+interface IProps {
+    defaultPublic?: boolean;
+    onFinished(): void;
+}
 
-export default class CreateMeetingDialog extends React.Component <any, any> {
-    displayName = "CreateMeetingDialog";
-    propTypes = {
-        onFinished: PropTypes.func.isRequired,
-        defaultPublic: PropTypes.bool
-    }
-
+export default class CreateMeetingDialog extends React.Component<IProps> {
     public render() {
         const title = _t("Schedule Meeting");
         return(

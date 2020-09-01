@@ -1,0 +1,40 @@
+.mx_MeetingTile_Container {
+    border: 0.0625rem solid black;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.mx_MeetingTile_Title {
+    background-color: rgba(141, 151, 165, 0.2);
+}
+
+.mx_MeetingTile_OverviewContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: white;
+}
+
+.mx_meetingTile_TimeContainer {
+    text-align: end;
+}
+
+.mx_meetingTile_TimeContainer_Date {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.mx_meetingTile_TimeContainer_TimeSlot {
+    font-size: 1.25rem;
+}
+
+.mx_MeetingTile_Button {
+    color: white;
+}
+
+.mx_MeetingTile_verticalDivider {
+    background: white;
+    height: 2.5rem;
+    width: 0.0625rem;
+    margin: 0 1rem;
+}

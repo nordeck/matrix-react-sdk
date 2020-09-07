@@ -69,6 +69,9 @@ export function textSerialize(model: EditorModel) {
 export function containsEmote(model: EditorModel) {
     return startsWith(model, "/me ", false);
 }
+export function containsConfetti(model: EditorModel) {
+    return startsWith(model, "/confetti", false);
+}
 
 export function startsWith(model: EditorModel, prefix: string, caseSensitive = true) {
     const firstPart = model.parts[0];
@@ -86,6 +89,10 @@ export function startsWith(model: EditorModel, prefix: string, caseSensitive = t
 export function stripEmoteCommand(model: EditorModel) {
     // trim "/me "
     return stripPrefix(model, "/me ");
+}
+export function stripConfettiCommand(model: EditorModel) {
+    // trim "/confetti"
+    return stripPrefix(model, "/confetti");
 }
 
 export function stripPrefix(model: EditorModel, prefix: string) {

@@ -44,7 +44,6 @@ import { ensureDMExists } from "./createRoom";
 import { ViewUserPayload } from "./dispatcher/payloads/ViewUserPayload";
 import { Action } from "./dispatcher/actions";
 import { EffectiveMembership, getEffectiveMembership, leaveRoomBehaviour } from "./utils/membership";
-import SettingsStore from "./settings/SettingsStore";
 
 // XXX: workaround for https://github.com/microsoft/TypeScript/issues/31816
 interface HTMLInputEvent extends Event {
@@ -1027,23 +1026,7 @@ export const Commands = [
         command: "confetti",
         description: _td("Sends the given message with confetti"),
         args: '<message>',
-        runFn: function(roomId, args) {
-            return success((async () => {
-                if (!args) {
-                    const senderName = MatrixClientPeg.get().getUserId().slice(1).split(":").slice(0, 1);
-                    args = _t("* %(senderName)s sends confetti", {senderName});
-                }
-                const content = {
-                    msgtype: 'nic.custom.confetti',
-                    body: args,
-                };
-                MatrixClientPeg.get().sendMessage(roomId, content);
-                if (!SettingsStore.getValue('dontShowChatEffects')) {
-                    dis.dispatch({action: 'confetti'});
-                }
-            })());
-        },
-        category: CommandCategories.actions,
+        category: CommandCategories.messages,
     }),
 
     // Command definitions for autocompletion ONLY:

@@ -26,6 +26,8 @@ import {
     unescapeMessage,
     startsWith,
     stripPrefix,
+    containsConfetti,
+    stripConfettiCommand,
 } from '../../../editor/serialize';
 import {CommandPartCreator} from '../../../editor/parts';
 import BasicMessageComposer from "./BasicMessageComposer";
@@ -65,8 +67,12 @@ function addReplyToMessageContent(content, repliedToEvent, permalinkCreator) {
 // exported for tests
 export function createMessageContent(model, permalinkCreator) {
     const isEmote = containsEmote(model);
+    const isConfetti = containsConfetti(model);
     if (isEmote) {
         model = stripEmoteCommand(model);
+    }
+    if (isConfetti) {
+        model = stripConfettiCommand(model);
     }
     if (startsWith(model, "//")) {
         model = stripPrefix(model, "/");
@@ -75,9 +81,11 @@ export function createMessageContent(model, permalinkCreator) {
     const repliedToEvent = RoomViewStore.getQuotingEvent();
 
     const body = textSerialize(model);
+    const userId = MatrixClientPeg.get().getUserId();
+    const senderName = MatrixClientPeg.get().getUser(userId).displayName;
     const content = {
-        msgtype: isEmote ? "m.emote" : "m.text",
-        body: body,
+        msgtype: isEmote ? "m.emote" : isConfetti ? "nic.custom.confetti" : "m.text",
+        body: isConfetti ? body ? body : _t("* %(senderName)s sends confetti", {senderName}) : body,
     };
     const formattedBody = htmlSerializeIfNeeded(model, {forceHTML: !!repliedToEvent});
     if (formattedBody) {
@@ -267,7 +275,7 @@ export default class SendMessageComposer extends React.Component {
 
         let shouldSend = true;
 
-        if (!containsEmote(this.model) && this._isSlashCommand()) {
+        if (!containsEmote(this.model) && !containsConfetti(this.model) && this._isSlashCommand()) {
             const [cmd, commandText] = this._getSlashCommand();
             if (cmd) {
                 shouldSend = false;
@@ -316,7 +324,7 @@ export default class SendMessageComposer extends React.Component {
             }
             dis.dispatch({action: "message_sent"});
             if (!SettingsStore.getValue('dontShowChatEffects')) {
-                if (isConfettiEmoji(content)) {
+                if (isConfettiEmoji(content) || content.msgtype === 'nic.custom.confetti') {
                 dis.dispatch({action: 'confetti'});
                 }
             }

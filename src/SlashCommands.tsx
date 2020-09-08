@@ -1030,7 +1030,7 @@ export const Commands = [
         runFn: function(roomId, args) {
             return success((async () => {
                 if (!args) {
-                    args = _t("sends confetti 🎉");
+                    args = _t("sends confetti") + " 🎉";
                     MatrixClientPeg.get().sendEmoteMessage(roomId, args);
                 } else {
                     const content = {

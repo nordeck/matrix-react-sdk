@@ -3,16 +3,11 @@ import PropTypes from 'prop-types';
 import {_t} from "../../../languageHandler";
 import {MatrixClientPeg} from "../../../MatrixClientPeg";
 import {getHttpUriForMxc} from "matrix-js-sdk/src/content-repo";
-import {humanizeTime} from "../../../utils/humanize";
 import BaseAvatar from "../../views/avatars/BaseAvatar";
 import AccessibleButton from "../../views/elements/AccessibleButton";
 import {makeUserPermalink} from "../../../utils/permalinks/Permalinks";
 import {RoomMember} from "matrix-js-sdk/src/matrix";
 import * as sdk from "../../../index";
-import {getDefaultIdentityServerUrl, useDefaultIdentityServer} from "../../../utils/IdentityServerUtils";
-import {abbreviateUrl} from "../../../utils/UrlUtils";
-import dis from "../../../dispatcher/dispatcher";
-import {Action} from "../../../dispatcher/actions";
 import RoomViewStore from "../../../stores/RoomViewStore";
 
 const INITIAL_USERS_SHOWN = 10;
@@ -27,7 +22,6 @@ class Member {
 class DMRoomTile extends React.PureComponent {
     static propTypes = {
         member: PropTypes.object.isRequired, // Should be a Member (see interface above)
-        lastActiveTs: PropTypes.number,
         onToggle: PropTypes.func.isRequired, // takes 1 argument, the member being toggled
         highlightWord: PropTypes.string,
         isSelected: PropTypes.bool,
@@ -82,9 +76,6 @@ class DMRoomTile extends React.PureComponent {
         const member = this.props.member;
         const avatarSize = 36;
         const emailAvatar = require("../../../../res/img/icon-email-pill-avatar.svg");
-        const timestamp = this.props.lastActiveTs
-            ? <span className='mx_InviteDialog_roomTile_time'>{ humanizeTime(this.props.lastActiveTs) }</span>
-            : null;
         const avatar = member.isEmail
             ? <img
                 src={ emailAvatar } alt={_t("User Icon")}
@@ -118,7 +109,6 @@ class DMRoomTile extends React.PureComponent {
                 { stackedAvatar }
                 <span className='mx_InviteDialog_roomTile_name'>{this._highlightName(member.name)}</span>
                 <span className='mx_InviteDialog_roomTile_userId'>{this._highlightName(member.userId)}</span>
-                { timestamp }
             </div>
         );
     }
@@ -210,7 +200,6 @@ export default class UserSelection extends React.Component {
         let sourceMembers = this.state.suggestions;
         let showNum = this.state.numSuggestionsShown;
         const showMoreFn = this._showMoreSuggestions.bind(this);
-        const lastActive = (m) => null;
 
         // Hide the section if there's nothing to filter by
         if (sourceMembers.length === 0) return null;
@@ -247,7 +236,6 @@ export default class UserSelection extends React.Component {
         const tiles = toRender.map(r => (
             <DMRoomTile
                 member={r.user}
-                lastActiveTs={lastActive(r)}
                 key={r.userId}
                 onToggle={this._toggleMember}
                 highlightWord={this.state.filterText}

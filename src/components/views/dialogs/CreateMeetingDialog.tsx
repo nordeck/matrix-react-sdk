@@ -39,10 +39,6 @@ export default class CreateMeetingDialog extends React.Component<IState> {
         return roomName + "-" + this.germanDate(date) + "-" + this.state.meetingTimeFrom;
     }
 
-    private getRoomMembers = (id: string) => {
-        return MatrixClientPeg.get().getRoom(id).currentState.members;
-    }
-
     private isDM = (room_id: string): boolean => {
         const id = DMRoomMap.shared().getUserIdForRoomId(room_id);
         return id !== undefined && id !== "";

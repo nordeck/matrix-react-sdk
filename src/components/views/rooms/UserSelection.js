@@ -196,16 +196,6 @@ export default class UserSelection extends React.Component {
         this._updateUserSelectionViaCallback();
     };
 
-    _removeMember = (member: Member) => {
-        const targets = this.state.targets.map(t => t); // cheap clone for mutation
-        const idx = targets.indexOf(member);
-        if (idx >= 0) {
-            targets.splice(idx, 1);
-            this.setState({targets});
-        }
-        this._updateUserSelectionViaCallback();
-    };
-
     _onClickInputArea = (e) => {
         // Stop the browser from highlighting text
         e.preventDefault();
@@ -214,20 +204,6 @@ export default class UserSelection extends React.Component {
         if (this._editorRef && this._editorRef.current) {
             this._editorRef.current.focus();
         }
-    };
-
-    _onUseDefaultIdentityServerClick = (e) => {
-        e.preventDefault();
-
-        // Update the IS in account data. Actually using it may trigger terms.
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useDefaultIdentityServer();
-        this.setState({canUseIdentityServer: true, tryingIdentityServer: false});
-    };
-
-    _onManageSettingsClick = (e) => {
-        e.preventDefault();
-        dis.fire(Action.ViewUserSettings);
     };
 
     _renderUserList() {
@@ -303,40 +279,6 @@ export default class UserSelection extends React.Component {
         );
     }
 
-    _renderIdentityServerWarning() {
-        if (!this.state.tryingIdentityServer || this.state.canUseIdentityServer) {
-            return null;
-        }
-
-        const defaultIdentityServerUrl = getDefaultIdentityServerUrl();
-        if (defaultIdentityServerUrl) {
-            return (
-                <div className="mx_AddressPickerDialog_identityServer">{_t(
-                    "Use an identity server to invite by email. " +
-                    "<default>Use the default (%(defaultIdentityServerName)s)</default> " +
-                    "or manage in <settings>Settings</settings>.",
-                    {
-                        defaultIdentityServerName: abbreviateUrl(defaultIdentityServerUrl),
-                    },
-                    {
-                        default: sub => <a href="#" onClick={this._onUseDefaultIdentityServerClick}>{sub}</a>,
-                        settings: sub => <a href="#" onClick={this._onManageSettingsClick}>{sub}</a>,
-                    },
-                )}</div>
-            );
-        } else {
-            return (
-                <div className="mx_AddressPickerDialog_identityServer">{_t(
-                    "Use an identity server to invite by email. " +
-                    "Manage in <settings>Settings</settings>.",
-                    {}, {
-                        settings: sub => <a href="#" onClick={this._onManageSettingsClick}>{sub}</a>,
-                    },
-                )}</div>
-            );
-        }
-    }
-
     render() {
 
         // only do this, if the parentRoom changed
@@ -364,7 +306,6 @@ export default class UserSelection extends React.Component {
                 <div className='mx_InviteDialog_addressBar'>
                     {this._renderEditor()}
                 </div>
-                {this._renderIdentityServerWarning()}
                 <div className='mx_InviteDialog_userSections'>
                     {this._renderUserList()}
                 </div>

@@ -6,7 +6,6 @@ import Field from '../elements/Field';
 import Dropdown from '../elements/Dropdown';
 import {MatrixClientPeg} from "../../../MatrixClientPeg";
 import DMRoomMap from '../../../utils/DMRoomMap'
-import RoomMember from "matrix-js-sdk/src/models/room-member";
 import RoomViewStore from '../../../stores/RoomViewStore';
 import UserSelection from "../rooms/UserSelection";
 
@@ -81,7 +80,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         meetingTimeFrom: this.formattedTime(new Date()),
         meetingTimeTill: this.formattedTime(new Date(Date.now() + (60*60*1000))),
         parentRoom: RoomViewStore.getRoomId(),
-        userSelection: []
+        userSelection: [MatrixClientPeg.get().getUserId()], // needs to be prefilled
     };
 
     public render() {
@@ -92,6 +91,16 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         const parentRoomOptions = rooms.map(room => {
             return <div key={ room.roomId }>{ room.name }</div>
         });
+        const buttons = this.isValidMeeting()
+            ? <DialogButtons
+                primaryButton={_t('Create Meeting')}
+                onPrimaryButtonClick={this.onOk}
+                onCancel={this.onCancel} />
+            : <DialogButtons
+                primaryButton={_t('Create Meeting')}
+                onPrimaryButtonClick={this.onOk}
+                onCancel={this.onCancel}
+                primaryDisabled={true} />;
 
         return(
             <BaseDialog className="mx_CreateMeetingDialog" title={_t("Schedule Meeting")} onFinished={this.onFinished} >
@@ -110,11 +119,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
                     <Field type="date" value={this.state.meetingDate} label={_t("Date")} onChange={this.onDateChange} />
                     <Field type="time" value={this.state.meetingTimeFrom} label={_t("From")} onChange={this.onFromChange} />
                     <Field type="time" value={this.state.meetingTimeTill} label={_t("Till")} onChange={this.onTillChange} />
-                    <DialogButtons
-                        primaryButton={_t('Create Meeting')}
-                        onPrimaryButtonClick={this.onOk}
-                        onCancel={this.onCancel}
-                    />
+                    { buttons }
                     <UserSelection roomId={this.state.parentRoom} userSelectionCallback={this.setUserSelection} />
                 </form>
             </BaseDialog>

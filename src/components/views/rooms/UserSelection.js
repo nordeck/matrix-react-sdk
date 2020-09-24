@@ -127,7 +127,7 @@ export default class UserSelection extends React.Component {
         super(props);
 
         this.state = {
-            targets: [], // array of Member objects (see interface above)
+            targets: this._selectAllUsers(this.props.roomId), // array of Member objects (see interface above)
             filterText: "",
             suggestions: this._buildUserSuggestions(props.roomId),
             numSuggestionsShown: INITIAL_USERS_SHOWN,
@@ -137,6 +137,7 @@ export default class UserSelection extends React.Component {
         };
 
         this._editorRef = createRef();
+        this._updateUserSelectionViaCallback();
     }
 
     _updateUserSelectionViaCallback() {
@@ -182,8 +183,7 @@ export default class UserSelection extends React.Component {
             targets.push(member);
             this.setState({filterText: ""}); // clear the filter when the user accepts a suggestion
         }
-        this.setState({targets});
-        this._updateUserSelectionViaCallback();
+        this.setState({targets}, this._updateUserSelectionViaCallback);
     };
 
     _onClickInputArea = (e) => {
@@ -278,6 +278,8 @@ export default class UserSelection extends React.Component {
             // update the roomId in state to track when the parentRoom changes
             this.state.selectedRoom = this.props.roomId;
         }
+
+        this._updateUserSelectionViaCallback();
 
         const userId = MatrixClientPeg.get().getUserId();
         const helpText = _t(

@@ -16,10 +16,18 @@ interface IState {
     meetingTimeFrom: string;
     meetingTimeTill: string;
     parentRoom: string;
-    userSelection: Record<string, RoomMember>;
+    userSelection: Array<string>;
 }
 
-export default class CreateMeetingDialog extends React.Component<IState> {
+interface IProps {
+    onFinished(b: boolean);
+}
+
+export default class CreateMeetingDialog extends React.Component<IProps, IState> {
+
+    constructor(props: IProps) {
+        super(props);
+    }
 
 // Util functions
     private formattedDate = (d: Date = new Date()): string => {
@@ -45,17 +53,23 @@ export default class CreateMeetingDialog extends React.Component<IState> {
     }
 
     private setUserSelection = (selection) => {
-        this.setState({userSelection: selection});
+        this.state.userSelection = selection;
+    }
+
+    private isValidMeeting = () => {
+        const areUsersSelected = this.state.userSelection.length > 0;
+        const validDate = new Date(this.state.meetingDate) >= new Date(this.formattedDate());
+        const stateFromTime = new Date("1/1/1999 " + this.state.meetingTimeFrom + ":00");
+        const currentTime = new Date("1/1/1999 " + this.formattedTime() + ":00");
+        const validStartingTime = stateFromTime >= currentTime;
+        return areUsersSelected && validDate && validStartingTime;
     }
 
 // modal interactivity functions
-    private onOk = () => {return null;}
-    private onFinished = () => {return null;}
-    private onCancel = () => {return null;}
-    private onParentRoomChange = (ev) => {
-        this.setState({parentRoom: ev});
-    }
-    private onUserSelectChange = () => {return null;}
+    private onOk = () => {this.isValidMeeting()}
+    private onFinished = () => {this.props.onFinished(false)}
+    private onCancel = () => {this.props.onFinished(false)}
+    private onParentRoomChange = (ev) => {this.setState({parentRoom: ev})}
     private onTopicChange = (ev) => {this.setState({meetingTopic: ev.target.value})}
     private onDateChange = (ev) => {this.setState({meetingDate: ev.target.value})}
     private onFromChange = (ev) => {this.setState({meetingTimeFrom: ev.target.value})}
@@ -67,7 +81,7 @@ export default class CreateMeetingDialog extends React.Component<IState> {
         meetingTimeFrom: this.formattedTime(new Date()),
         meetingTimeTill: this.formattedTime(new Date(Date.now() + (60*60*1000))),
         parentRoom: RoomViewStore.getRoomId(),
-        userSelection: {}
+        userSelection: []
     };
 
     public render() {

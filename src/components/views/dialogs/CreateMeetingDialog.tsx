@@ -65,7 +65,20 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     }
 
 // modal interactivity functions
-    private onOk = () => {this.isValidMeeting()}
+    private onOk = () => {
+        if(!this.isValidMeeting()){
+            alert("Something went wrong");
+            return;
+        }
+        const roomId = this.state.parentRoom;
+        const eventType = "nic.meetings.meeting";
+        const content = {
+            status: "PLANNED",
+            topic: this.state.meetingTopic,
+            parentRoom: this.state.parentRoom,
+        }
+        MatrixClientPeg.get().sendEvent(roomId, eventType, content);
+    }
     private onFinished = () => {this.props.onFinished(false)}
     private onCancel = () => {this.props.onFinished(false)}
     private onParentRoomChange = (ev) => {this.setState({parentRoom: ev})}

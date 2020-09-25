@@ -8,6 +8,7 @@ import {MatrixClientPeg} from "../../../MatrixClientPeg";
 import DMRoomMap from '../../../utils/DMRoomMap'
 import RoomViewStore from '../../../stores/RoomViewStore';
 import UserSelection from "../rooms/UserSelection";
+import {Meeting} from '../../../utils/Meeting'
 
 interface IState {
     meetingTopic: string;
@@ -41,7 +42,8 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         return d.toLocaleDateString("de-DE", { day: '2-digit', month: '2-digit', year: 'numeric'});
     }
 
-    private generateMeetingTitle = (roomName: string): string => {
+    private generateMeetingTitle = (): string => {
+        const roomName = this.getParentRoom().name;
         const date = new Date(this.state.meetingDate);
         return roomName + "-" + this.germanDate(date) + "-" + this.state.meetingTimeFrom;
     }
@@ -58,10 +60,23 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     private isValidMeeting = () => {
         const areUsersSelected = this.state.userSelection.length > 0;
         const validDate = new Date(this.state.meetingDate) >= new Date(this.formattedDate());
-        const stateFromTime = new Date("1/1/1999 " + this.state.meetingTimeFrom + ":00");
+        const startTime = new Date("1/1/1999 " + this.state.meetingTimeFrom + ":00");
         const currentTime = new Date("1/1/1999 " + this.formattedTime() + ":00");
-        const validStartingTime = stateFromTime >= currentTime;
+        const validStartingTime = startTime >= currentTime;
         return areUsersSelected && validDate && validStartingTime;
+    }
+
+    private getParentRoom = () => {
+        const client = MatrixClientPeg.get();
+        return client.getVisibleRooms().filter(room => room.roomId === this.state.parentRoom)[0];
+    }
+
+    private getUsableMeetingDate = (time: string): Date => {
+         // Format of meetingDate: "2020-09-24"
+         // Format of meetingTimeFrom: "15:11"
+         // Possible valid input format of Date: 1995-12-17T03:24:00
+        const date = this.state.meetingDate;
+        return new Date(date + 'T' + time + ':00');
     }
 
 // modal interactivity functions
@@ -70,15 +85,29 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
             alert("Something went wrong");
             return;
         }
+        const state = this.state;
         const roomId = this.state.parentRoom;
         const eventType = "nic.meetings.meeting";
-        const content = {
-            status: "PLANNED",
-            topic: this.state.meetingTopic,
-            parentRoom: this.state.parentRoom,
-        }
-        MatrixClientPeg.get().sendEvent(roomId, eventType, content);
+        const meeting = new Meeting();
+
+        const meetingStart = this.getUsableMeetingDate(state.meetingTimeFrom).getTime();
+        const possibleMeetingEnd = this.getUsableMeetingDate(state.meetingTimeTill).getTime();
+        const oneDay = 1000 * 60 * 60 * 24;
+        const meetingEnd = possibleMeetingEnd > meetingStart ? possibleMeetingEnd : possibleMeetingEnd + oneDay;
+
+        meeting.name = this.generateMeetingTitle();
+        meeting.topic = state.meetingTopic;
+        meeting.parent_room_id = state.parentRoom;
+        meeting.parent_room_name = this.getParentRoom().name;
+        meeting.room_name = this.generateMeetingTitle();
+        meeting.start_time = meetingStart;
+        meeting.end_time = meetingEnd;
+        meeting.creator = MatrixClientPeg.get().getUserId();
+        meeting.participants = state.userSelection;
+
+        MatrixClientPeg.get().sendEvent(roomId, eventType, meeting);
     }
+
     private onFinished = () => {this.props.onFinished(false)}
     private onCancel = () => {this.props.onFinished(false)}
     private onParentRoomChange = (ev) => {this.setState({parentRoom: ev})}
@@ -90,8 +119,8 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     state = {
         meetingTopic: "",
         meetingDate: this.formattedDate(),
-        meetingTimeFrom: this.formattedTime(new Date()),
-        meetingTimeTill: this.formattedTime(new Date(Date.now() + (60*60*1000))),
+        meetingTimeFrom: this.formattedTime(new Date(Date.now() + (5*60*1000))),
+        meetingTimeTill: this.formattedTime(new Date(Date.now() + (65*60*1000))),
         parentRoom: RoomViewStore.getRoomId(),
         userSelection: [MatrixClientPeg.get().getUserId()], // needs to be prefilled
     };
@@ -99,8 +128,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     public render() {
         const client = MatrixClientPeg.get();
         const rooms = client.getVisibleRooms().filter(room => !this.isDM(room.roomId));
-        const currentRoom = client.getVisibleRooms().filter(room => room.roomId === this.state.parentRoom)[0];
-        const meetingTitle = this.generateMeetingTitle(currentRoom.name);
+        const meetingTitle = this.generateMeetingTitle();
         const parentRoomOptions = rooms.map(room => {
             return <div key={ room.roomId }>{ room.name }</div>
         });

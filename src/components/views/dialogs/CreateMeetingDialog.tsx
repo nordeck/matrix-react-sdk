@@ -9,6 +9,7 @@ import DMRoomMap from '../../../utils/DMRoomMap'
 import RoomViewStore from '../../../stores/RoomViewStore';
 import UserSelection from "../rooms/UserSelection";
 import {Meeting} from '../../../utils/Meeting'
+import StyledCheckbox from "../elements/StyledCheckbox";
 
 interface IState {
     meetingTopic: string;
@@ -17,6 +18,7 @@ interface IState {
     meetingTimeTill: string;
     parentRoom: string;
     userSelection: Array<string>;
+    autoJoin: boolean;
 }
 
 interface IProps {
@@ -93,7 +95,9 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         const meetingStart = this.getUsableMeetingDate(state.meetingTimeFrom).getTime();
         const possibleMeetingEnd = this.getUsableMeetingDate(state.meetingTimeTill).getTime();
         const oneDay = 1000 * 60 * 60 * 24;
-        const meetingEnd = possibleMeetingEnd > meetingStart ? possibleMeetingEnd : possibleMeetingEnd + oneDay;
+        const meetingEnd = possibleMeetingEnd > meetingStart
+            ? possibleMeetingEnd
+            : possibleMeetingEnd + oneDay;
 
         meeting.name = this.generateMeetingTitle();
         meeting.topic = state.meetingTopic;
@@ -104,6 +108,8 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         meeting.end_time = meetingEnd;
         meeting.creator = MatrixClientPeg.get().getUserId();
         meeting.participants = state.userSelection;
+        meeting.auto_join = state.autoJoin;
+        meeting.widgets = ["jitsi", "etherpad"];
 
         MatrixClientPeg.get().sendEvent(roomId, eventType, meeting);
     }
@@ -115,6 +121,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     private onDateChange = (ev) => {this.setState({meetingDate: ev.target.value})}
     private onFromChange = (ev) => {this.setState({meetingTimeFrom: ev.target.value})}
     private onTillChange = (ev) => {this.setState({meetingTimeTill: ev.target.value})}
+    private onAutoJoinChange = () => {this.setState({autoJoin: !this.state.autoJoin})}
 
     state = {
         meetingTopic: "",
@@ -123,6 +130,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         meetingTimeTill: this.formattedTime(new Date(Date.now() + (65*60*1000))),
         parentRoom: RoomViewStore.getRoomId(),
         userSelection: [MatrixClientPeg.get().getUserId()], // needs to be prefilled
+        autoJoin: false,
     };
 
     public render() {
@@ -160,6 +168,9 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
                     <Field type="date" value={this.state.meetingDate} label={_t("Date")} onChange={this.onDateChange} />
                     <Field type="time" value={this.state.meetingTimeFrom} label={_t("From")} onChange={this.onFromChange} />
                     <Field type="time" value={this.state.meetingTimeTill} label={_t("Till")} onChange={this.onTillChange} />
+                    <StyledCheckbox checked={this.state.autoJoin} onChange={this.onAutoJoinChange}>
+                        {_t("Invited users automatically accept the meeting invitation")}
+                    </StyledCheckbox>
                     { buttons }
                     <UserSelection roomId={this.state.parentRoom} userSelectionCallback={this.setUserSelection} />
                 </form>

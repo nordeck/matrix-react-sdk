@@ -2373,5 +2373,6 @@
     "Meeting Topic": "Meeting Topic",
     "Your meeting topic here": "Your meeting topic here",
     "Invite someone using their name, email address, or username (like <userId/>).": "Invite someone using their name, email address, or username (like <userId/>).",
-    "User Icon": "User Icon"
+    "User Icon": "User Icon",
+    "Invited users automatically accept the meeting invitation": "Invited users automatically accept the meeting invitation"
 }

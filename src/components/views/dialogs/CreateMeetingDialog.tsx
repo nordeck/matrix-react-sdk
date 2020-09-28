@@ -60,11 +60,17 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     }
 
     private isValidMeeting = () => {
+        const oneDay = 86400000;
+        // Create a date object with the current day at 00:00 o'clock
+        const dateTodayBase = new Date(); dateTodayBase.setHours(0,0,0,0);
+        // Is the meeting scheduled for a future date?
+        const isDateTomorrowOrLater = new Date(this.state.meetingDate) >= new Date(dateTodayBase.getTime() + oneDay);
         const areUsersSelected = this.state.userSelection.length > 0;
-        const validDate = new Date(this.state.meetingDate) >= new Date(this.formattedDate());
+        const validDate = new Date(this.state.meetingDate) >= dateTodayBase;
         const startTime = new Date("1/1/1999 " + this.state.meetingTimeFrom + ":00");
         const currentTime = new Date("1/1/1999 " + this.formattedTime() + ":00");
-        const validStartingTime = startTime >= currentTime;
+        // If the meeting is in the future, then the starting time isn't relevant, else check if it is before now
+        const validStartingTime = isDateTomorrowOrLater ? true : startTime >= currentTime;
         return areUsersSelected && validDate && validStartingTime;
     }
 
@@ -73,11 +79,10 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         return client.getVisibleRooms().filter(room => room.roomId === this.state.parentRoom)[0];
     }
 
-    private getUsableMeetingDate = (time: string): Date => {
-         // Format of meetingDate: "2020-09-24"
-         // Format of meetingTimeFrom: "15:11"
+    private getUsableMeetingDate = (time: string = "00:00", date: string = this.state.meetingDate): Date => {
+         // Format of date: "2020-09-24"
+         // Format of time: "15:11"
          // Possible valid input format of Date: 1995-12-17T03:24:00
-        const date = this.state.meetingDate;
         return new Date(date + 'T' + time + ':00');
     }
 
@@ -112,6 +117,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         meeting.widgets = ["jitsi", "etherpad"];
 
         MatrixClientPeg.get().sendEvent(roomId, eventType, meeting);
+        this.props.onFinished(true);
     }
 
     private onFinished = () => {this.props.onFinished(false)}

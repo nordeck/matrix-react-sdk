@@ -63,14 +63,13 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         const oneDay = 86400000;
         // Create a date object with the current day at 00:00 o'clock
         const dateTodayBase = new Date(); dateTodayBase.setHours(0,0,0,0);
-        // Is the meeting scheduled for a future date?
-        const isDateTomorrowOrLater = new Date(this.state.meetingDate) >= new Date(dateTodayBase.getTime() + oneDay);
+        const isMeetingScheduledForAFutureDate = new Date(this.state.meetingDate) >= new Date(dateTodayBase.getTime() + oneDay);
         const areUsersSelected = this.state.userSelection.length > 0;
         const validDate = new Date(this.state.meetingDate) >= dateTodayBase;
         const startTime = new Date("1/1/1999 " + this.state.meetingTimeFrom + ":00");
         const currentTime = new Date("1/1/1999 " + this.formattedTime() + ":00");
         // If the meeting is in the future, then the starting time isn't relevant, else check if it is before now
-        const validStartingTime = isDateTomorrowOrLater ? true : startTime >= currentTime;
+        const validStartingTime = isMeetingScheduledForAFutureDate ? true : startTime >= currentTime;
         return areUsersSelected && validDate && validStartingTime;
     }
 

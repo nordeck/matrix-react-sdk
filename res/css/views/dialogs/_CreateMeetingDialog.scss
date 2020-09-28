@@ -1,0 +1,16 @@
+.mx_CreateMeetingDialog_input {
+    font-size: $font-15px;
+    border-radius: 3px;
+    border: 1px solid $input-border-color;
+    padding: 9px;
+    color: $primary-fg-color;
+    background-color: $primary-bg-color;
+}
+
+.mx_CreateMeetingDialog_tempSpacing {
+    display: grid;
+}
+
+.mx_CreateMeetingDialog {
+    max-width: 60vw !important;
+}

@@ -1,4 +1,4 @@
-//import Utils from "./Utils";
+import Utils from "../Utils";
 
 export class Meeting {
 
@@ -18,10 +18,11 @@ export class Meeting {
 
     previous_start_time: number;
     previous_end_time: number;
-    previous_participants: number;
+    previous_participants: string[];
 
     status: MeetingStatus;
     participants: string[];
+    auto_join: boolean;
     widgets: string[];
 
     constructor() {
@@ -29,8 +30,9 @@ export class Meeting {
     }
 
     initialize() {
-        //this.meeting_id = Utils.<randomUUID>();
+        this.meeting_id = Utils.randomUUID();
         this.status = "CREATED";
+        this.auto_join = false;
     }
 
     toString() {
@@ -55,6 +57,7 @@ export class Meeting {
         meeting.participants = event["content"]["participants"];
         meeting.widgets = event["content"]["widgets"];
         meeting.creator = event["content"]["creator"];
+        meeting.auto_join = event["content"]["auto_join"];
 
         if (event["unsigned"]["prev_content"]) {
             meeting.previous_start_time = event["unsigned"]["prev_content"]["start_time"];

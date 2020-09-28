@@ -6,16 +6,24 @@ import MeetingList from './MeetingList';
 import {Meeting} from "../../../utils/Meeting";
 import MatrixClientContext from "../../../contexts/MatrixClientContext";
 import PropTypes from "prop-types";
-
-export default class MeetingPanel extends React.Component {
+interface IProps {
+    roomId: string;
+}
+interface IState {
+    meetingsList: Array<Meeting>,
+}
+export default class MeetingPanel extends React.Component<IProps, IState> {
     meetingsList: Array<Meeting> = [];
     static propTypes = {
         roomId: PropTypes.string,
     }
     static contextType = MatrixClientContext;
 
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
+       this.state = {
+            meetingsList: [],
+        };
         this.getMeetingEventsList = this.getMeetingEventsList.bind(this);
         this.fillMeetingsList = this.fillMeetingsList.bind(this);
         this.onRoomStateEvents = this.onRoomStateEvents.bind(this);
@@ -58,7 +66,7 @@ export default class MeetingPanel extends React.Component {
         if (meetingEvent.getContent().parent_room_id === this.props.roomId) {
             this.meetingsList = this.meetingsList.filter(meeting => meeting.meeting_id !== meetingEvent.getContent().meeting_id);
             this.meetingsList.push(meetingEvent.getContent());
-            console.log('meeting list after update', this.meetingsList);
+           this.setState( {meetingsList: this.meetingsList });
         }
     }
 
@@ -68,7 +76,7 @@ export default class MeetingPanel extends React.Component {
                 <AutoHideScrollbar>
                     <div className="mx_MeetingPanel_wrapper">
                         <div className="mx_MeetingPanel_title">{_t("Meeting History")}</div>
-                        <MeetingList key="MeetingList" meetingList={this.meetingsList} />
+                        <MeetingList key="MeetingList" meetingList={this.state.meetingsList} />
                         <MeetingButtons key="MeetingButtons" />
                     </div>
                 </AutoHideScrollbar>

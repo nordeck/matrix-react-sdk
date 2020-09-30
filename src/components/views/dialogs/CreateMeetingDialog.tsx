@@ -115,7 +115,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
         meeting.auto_join = state.autoJoin;
         meeting.widgets = ["jitsi", "etherpad"];
 
-        MatrixClientPeg.get().sendEvent(roomId, eventType, meeting);
+        MatrixClientPeg.get().sendStateEvent(roomId, eventType, meeting);
         this.props.onFinished(true);
     }
 

@@ -26,6 +26,7 @@ import {RightPanelPhases} from "../../../stores/RightPanelStorePhases";
 import {Action} from "../../../dispatcher/actions";
 import {ActionPayload} from "../../../dispatcher/payloads";
 import RightPanelStore from "../../../stores/RightPanelStore";
+import SettingsStore from "../../../settings/SettingsStore";
 
 const ROOM_INFO_PHASES = [
     RightPanelPhases.RoomSummary,

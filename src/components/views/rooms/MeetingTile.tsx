@@ -1,5 +1,6 @@
 import React from 'react';
 import { Meeting } from '../../../utils/Meeting';
+import MatrixClientContext from "../../../contexts/MatrixClientContext";
 
 function msToTime(input) {
     const date = new Date(input);
@@ -13,6 +14,7 @@ interface IProps {
 }
 
 export default class MeetingTile extends React.Component<IProps> {
+    static contextType = MatrixClientContext ;
     constructor(props: IProps) {
         super(props);
     }
@@ -25,9 +27,15 @@ export default class MeetingTile extends React.Component<IProps> {
         const date = new Date(meeting.start_time);
         const meetingDate = date.getDate() + "." + date.getMonth() + "." + date.getFullYear();
 
+        const meetingRoom = this.context.getRoom(meeting.room_id);
+        const userId = this.context.getUserId();
+        const badge = meetingRoom? meeting.room_id === meetingRoom.roomId ?
+            meetingRoom.hasMembershipState(userId, "invite")? (
+                <span className="badge" aria-hidden="true" />
+            ) : null : null: null;
         const vertDivider = <span className="mx_MeetingTile_verticalDivider" />;
         const meetingTitle = meeting.name !== undefined
-            ? <div className="mx_MeetingTile_Title">{ meeting.name }</div>
+            ? <div className="mx_MeetingTile_Title">{badge}{ meeting.name }</div>
             : null;
         const dateContainer =
             <div className="mx_meetingTile_TimeContainer">

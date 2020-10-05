@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import * as sdk from '../../../index';
 import SdkConfig from '../../../SdkConfig';
@@ -25,19 +24,19 @@ import { _t } from '../../../languageHandler';
 import {MatrixClientPeg} from '../../../MatrixClientPeg';
 import {Key} from "../../../Keyboard";
 import {privateShouldBeEncrypted} from "../../../createRoom";
-import TagOrderStore from "../../../stores/TagOrderStore";
-import GroupStore from "../../../stores/GroupStore";
+import {CommunityPrototypeStore} from "../../../stores/CommunityPrototypeStore";
 
-export default createReactClass({
-    displayName: 'CreateRoomDialog',
-    propTypes: {
+export default class CreateRoomDialog extends React.Component {
+    static propTypes = {
         onFinished: PropTypes.func.isRequired,
         defaultPublic: PropTypes.bool,
-    },
+    };
 
-    getInitialState() {
+    constructor(props) {
+        super(props);
+
         const config = SdkConfig.get();
-        return {
+        this.state = {
             isPublic: this.props.defaultPublic || false,
             isEncrypted: privateShouldBeEncrypted(),
             name: "",
@@ -46,8 +45,12 @@ export default createReactClass({
             detailsOpen: false,
             noFederate: config.default_federate === false,
             nameIsValid: false,
+            canChangeEncryption: true,
         };
-    },
+
+        MatrixClientPeg.get().doesServerForceEncryptionForPreset("private")
+            .then(isForced => this.setState({canChangeEncryption: !isForced}));
+    }
 
     _roomCreateOptions() {
         const opts = {};
@@ -69,35 +72,41 @@ export default createReactClass({
         }
 
         if (!this.state.isPublic) {
-            opts.encryption = this.state.isEncrypted;
+            if (this.state.canChangeEncryption) {
+                opts.encryption = this.state.isEncrypted;
+            } else {
+                // the server should automatically do this for us, but for safety
+                // we'll demand it too.
+                opts.encryption = true;
+            }
         }
 
-        if (TagOrderStore.getSelectedPrototypeTag()) {
-            opts.associatedWithCommunity = TagOrderStore.getSelectedPrototypeTag();
+        if (CommunityPrototypeStore.instance.getSelectedCommunityId()) {
+            opts.associatedWithCommunity = CommunityPrototypeStore.instance.getSelectedCommunityId();
         }
 
         return opts;
-    },
+    }
 
     componentDidMount() {
         this._detailsRef.addEventListener("toggle", this.onDetailsToggled);
         // move focus to first field when showing dialog
         this._nameFieldRef.focus();
-    },
+    }
 
     componentWillUnmount() {
         this._detailsRef.removeEventListener("toggle", this.onDetailsToggled);
-    },
+    }
 
-    _onKeyDown: function(event) {
+    _onKeyDown = event => {
         if (event.key === Key.ENTER) {
             this.onOk();
             event.preventDefault();
             event.stopPropagation();
         }
-    },
+    };
 
-    onOk: async function() {
+    onOk = async () => {
         const activeElement = document.activeElement;
         if (activeElement) {
             activeElement.blur();
@@ -123,51 +132,51 @@ export default createReactClass({
                 field.validate({ allowEmpty: false, focused: true });
             }
         }
-    },
+    };
 
-    onCancel: function() {
+    onCancel = () => {
         this.props.onFinished(false);
-    },
+    };
 
-    onNameChange(ev) {
+    onNameChange = ev => {
         this.setState({name: ev.target.value});
-    },
+    };
 
-    onTopicChange(ev) {
+    onTopicChange = ev => {
         this.setState({topic: ev.target.value});
-    },
+    };
 
-    onPublicChange(isPublic) {
+    onPublicChange = isPublic => {
         this.setState({isPublic});
-    },
+    };
 
-    onEncryptedChange(isEncrypted) {
+    onEncryptedChange = isEncrypted => {
         this.setState({isEncrypted});
-    },
+    };
 
-    onAliasChange(alias) {
+    onAliasChange = alias => {
         this.setState({alias});
-    },
+    };
 
-    onDetailsToggled(ev) {
+    onDetailsToggled = ev => {
         this.setState({detailsOpen: ev.target.open});
-    },
+    };
 
-    onNoFederateChange(noFederate) {
+    onNoFederateChange = noFederate => {
         this.setState({noFederate});
-    },
+    };
 
-    collectDetailsRef(ref) {
+    collectDetailsRef = ref => {
         this._detailsRef = ref;
-    },
+    };
 
-    async onNameValidate(fieldState) {
-        const result = await this._validateRoomName(fieldState);
+    onNameValidate = async fieldState => {
+        const result = await CreateRoomDialog._validateRoomName(fieldState);
         this.setState({nameIsValid: result.valid});
         return result;
-    },
+    };
 
-    _validateRoomName: withValidation({
+    static _validateRoomName = withValidation({
         rules: [
             {
                 key: "required",
@@ -175,9 +184,9 @@ export default createReactClass({
                 invalid: () => _t("Please enter a name for the room"),
             },
         ],
-    }),
+    });
 
-    render: function() {
+    render() {
         const BaseDialog = sdk.getComponent('views.dialogs.BaseDialog');
         const DialogButtons = sdk.getComponent('views.elements.DialogButtons');
         const Field = sdk.getComponent('views.elements.Field');
@@ -198,7 +207,7 @@ export default createReactClass({
             "Private rooms can be found and joined by invitation only. Public rooms can be " +
             "found and joined by anyone.",
         )}</p>;
-        if (TagOrderStore.getSelectedPrototypeTag()) {
+        if (CommunityPrototypeStore.instance.getSelectedCommunityId()) {
             publicPrivateLabel = <p>{_t(
                 "Private rooms can be found and joined by invitation only. Public rooms can be " +
                 "found and joined by anyone in this community.",
@@ -209,7 +218,11 @@ export default createReactClass({
         if (!this.state.isPublic) {
             let microcopy;
             if (privateShouldBeEncrypted()) {
-                microcopy = _t("You can’t disable this later. Bridges & most bots won’t work yet.");
+                if (this.state.canChangeEncryption) {
+                    microcopy = _t("You can’t disable this later. Bridges & most bots won’t work yet.");
+                } else {
+                    microcopy = _t("Your server requires encryption to be enabled in private rooms.");
+                }
             } else {
                 microcopy = _t("Your server admin has disabled end-to-end encryption by default " +
                     "in private rooms & Direct Messages.");
@@ -220,6 +233,7 @@ export default createReactClass({
                     onChange={this.onEncryptedChange}
                     value={this.state.isEncrypted}
                     className='mx_CreateRoomDialog_e2eSwitch' // for end-to-end tests
+                    disabled={!this.state.canChangeEncryption}
                 />
                 <p>{ microcopy }</p>
             </React.Fragment>;
@@ -239,9 +253,8 @@ export default createReactClass({
         }
 
         let title = this.state.isPublic ? _t('Create a public room') : _t('Create a private room');
-        if (TagOrderStore.getSelectedPrototypeTag()) {
-            const summary = GroupStore.getSummary(TagOrderStore.getSelectedPrototypeTag());
-            const name = summary?.profile?.name || TagOrderStore.getSelectedPrototypeTag();
+        if (CommunityPrototypeStore.instance.getSelectedCommunityId()) {
+            const name = CommunityPrototypeStore.instance.getSelectedCommunityName();
             title = _t("Create a room in %(communityName)s", {communityName: name});
         }
         return (
@@ -275,5 +288,5 @@ export default createReactClass({
                     onCancel={this.onCancel} />
             </BaseDialog>
         );
-    },
-});
+    }
+}

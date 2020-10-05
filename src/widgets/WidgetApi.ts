@@ -34,10 +34,12 @@ export enum KnownWidgetActions {
     GetCapabilities = "capabilities",
     SendEvent = "send_event",
     UpdateVisibility = "visibility",
+    GetOpenIDCredentials = "get_openid",
     ReceiveOpenIDCredentials = "openid_credentials",
     SetAlwaysOnScreen = "set_always_on_screen",
     ClientReady = "im.vector.ready",
     Terminate = "im.vector.terminate",
+    Hangup = "im.vector.hangup",
 }
 
 export type WidgetAction = KnownWidgetActions | string;
@@ -64,6 +66,13 @@ export interface FromWidgetRequest extends WidgetRequest {
     response: any;
 }
 
+export interface OpenIDCredentials {
+    accessToken: string;
+    tokenType: string;
+    matrixServerName: string;
+    expiresIn: number;
+}
+
 /**
  * Handles Element <--> Widget interactions for embedded/standalone widgets.
  *
@@ -73,10 +82,12 @@ export interface FromWidgetRequest extends WidgetRequest {
  *   the given promise resolves.
  */
 export class WidgetApi extends EventEmitter {
-    private origin: string;
+    private readonly origin: string;
     private inFlightRequests: { [requestId: string]: (reply: FromWidgetRequest) => void } = {};
-    private readyPromise: Promise<any>;
+    private readonly readyPromise: Promise<any>;
     private readyPromiseResolve: () => void;
+    private openIDCredentialsCallback: () => void;
+    public openIDCredentials: OpenIDCredentials;
 
     /**
      * Set this to true if your widget is expecting a ready message from the client. False otherwise (default).
@@ -109,17 +120,23 @@ export class WidgetApi extends EventEmitter {
 
                     // Automatically acknowledge so we can move on
                     this.replyToRequest(<ToWidgetRequest>payload, {});
-                } else if (payload.action === KnownWidgetActions.Terminate) {
+                } else if (payload.action === KnownWidgetActions.Terminate
+                    || payload.action === KnownWidgetActions.Hangup) {
                     // Finalization needs to be async, so postpone with a promise
                     let finalizePromise = Promise.resolve();
                     const wait = (promise) => {
                         finalizePromise = finalizePromise.then(() => promise);
                     };
-                    this.emit('terminate', wait);
+                    const emitName = payload.action === KnownWidgetActions.Terminate ? 'terminate' : 'hangup';
+                    this.emit(emitName, wait);
                     Promise.resolve(finalizePromise).then(() => {
                         // Acknowledge that we're shut down now
                         this.replyToRequest(<ToWidgetRequest>payload, {});
                     });
+                } else if (payload.action === KnownWidgetActions.ReceiveOpenIDCredentials) {
+                    // Save OpenID credentials
+                    this.setOpenIDCredentials(<ToWidgetRequest>payload);
+                    this.replyToRequest(<ToWidgetRequest>payload, {});
                 } else {
                     console.warn(`[WidgetAPI] Got unexpected action: ${payload.action}`);
                 }
@@ -132,6 +149,32 @@ export class WidgetApi extends EventEmitter {
                 console.warn(`[WidgetAPI] Unhandled payload: ${JSON.stringify(payload)}`);
             }
         });
+    }
+
+    public setOpenIDCredentials(value: WidgetRequest) {
+        const data = value.data;
+        if (data.state === 'allowed') {
+            this.openIDCredentials = {
+                accessToken: data.access_token,
+                tokenType: data.token_type,
+                matrixServerName: data.matrix_server_name,
+                expiresIn: data.expires_in,
+            }
+        } else if (data.state === 'blocked') {
+            this.openIDCredentials = null;
+        }
+        if (['allowed', 'blocked'].includes(data.state) && this.openIDCredentialsCallback) {
+            this.openIDCredentialsCallback()
+        }
+    }
+
+    public requestOpenIDCredentials(credentialsResponseCallback: () => void) {
+        this.openIDCredentialsCallback = credentialsResponseCallback;
+        this.callAction(
+            KnownWidgetActions.GetOpenIDCredentials,
+            {},
+            this.setOpenIDCredentials,
+        );
     }
 
     public waitReady(): Promise<any> {

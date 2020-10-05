@@ -28,6 +28,9 @@ import SettingsStore from "../settings/SettingsStore";
 import {ActiveRoomObserver} from "../ActiveRoomObserver";
 import {Notifier} from "../Notifier";
 import type {Renderer} from "react-dom";
+import RightPanelStore from "../stores/RightPanelStore";
+import WidgetStore from "../stores/WidgetStore";
+import CallHandler from "../CallHandler";
 
 declare global {
     interface Window {
@@ -49,6 +52,9 @@ declare global {
         singletonModalManager: ModalManager;
         mxSettingsStore: SettingsStore;
         mxNotifier: typeof Notifier;
+        mxRightPanelStore: RightPanelStore;
+        mxWidgetStore: WidgetStore;
+        mxCallHandler: CallHandler;
     }
 
     interface Document {
@@ -58,6 +64,9 @@ declare global {
 
     interface Navigator {
         userLanguage?: string;
+        // https://github.com/Microsoft/TypeScript/issues/19473
+        // https://developer.mozilla.org/en-US/docs/Web/API/MediaSession
+        mediaSession: any;
     }
 
     interface StorageEstimate {

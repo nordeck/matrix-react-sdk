@@ -19,16 +19,18 @@ limitations under the License.
 */
 
 import React from 'react';
-import { _t } from '../../../languageHandler';
+import {_t} from '../../../languageHandler';
 import HeaderButton from './HeaderButton';
 import HeaderButtons, {HeaderKind} from './HeaderButtons';
 import {RightPanelPhases} from "../../../stores/RightPanelStorePhases";
 import {Action} from "../../../dispatcher/actions";
 import {ActionPayload} from "../../../dispatcher/payloads";
-import SettingsStore from "../../../settings/SettingsStore";
+import RightPanelStore from "../../../stores/RightPanelStore";
 
-
-const MEMBER_PHASES = [
+const ROOM_INFO_PHASES = [
+    RightPanelPhases.RoomSummary,
+    RightPanelPhases.Widget,
+    RightPanelPhases.FilePanel,
     RightPanelPhases.RoomMemberList,
     RightPanelPhases.RoomMemberInfo,
     RightPanelPhases.EncryptionPanel,
@@ -41,7 +43,6 @@ export default class RoomHeaderButtons extends HeaderButtons {
     }
 
     protected onAction(payload: ActionPayload) {
-        super.onAction(payload);
         if (payload.action === Action.ViewUser) {
             if (payload.member) {
                 this.setPhase(RightPanelPhases.RoomMemberInfo, {member: payload.member});
@@ -57,26 +58,25 @@ export default class RoomHeaderButtons extends HeaderButtons {
         }
     }
 
-    private onMembersClicked = () => {
-        if (this.state.phase === RightPanelPhases.RoomMemberInfo) {
-            // send the active phase to trigger a toggle
-            // XXX: we should pass refireParams here but then it won't collapse as we desire it to
-            this.setPhase(RightPanelPhases.RoomMemberInfo);
+    private onRoomSummaryClicked = () => {
+        // use roomPanelPhase rather than this.state.phase as it remembers the latest one if we close
+        const lastPhase = RightPanelStore.getSharedInstance().roomPanelPhase;
+        if (ROOM_INFO_PHASES.includes(lastPhase)) {
+            if (this.state.phase === lastPhase) {
+                this.setPhase(lastPhase);
+            } else {
+                this.setPhase(lastPhase, RightPanelStore.getSharedInstance().roomPanelPhaseParams);
+            }
         } else {
             // This toggles for us, if needed
-            this.setPhase(RightPanelPhases.RoomMemberList);
+            this.setPhase(RightPanelPhases.RoomSummary);
         }
-    }
-
-    private onFilesClicked = () => {
-        // This toggles for us, if needed
-        this.setPhase(RightPanelPhases.FilePanel);
-    }
+    };
 
     private onNotificationsClicked = () => {
         // This toggles for us, if needed
         this.setPhase(RightPanelPhases.NotificationPanel);
-    }
+    };
 
     private onMeetingsClicked = () => {
         // This toggles for us, if needed
@@ -93,25 +93,23 @@ export default class RoomHeaderButtons extends HeaderButtons {
             : null;
 
         return [
-            <HeaderButton key="membersButton" name="membersButton"
-                title={_t('Members')}
-                isHighlighted={this.isPhase(MEMBER_PHASES)}
-                onClick={this.onMembersClicked}
-                analytics={['Right Panel', 'Member List Button', 'click']}
-            />,
-            <HeaderButton key="filesButton" name="filesButton"
-                title={_t('Files')}
-                isHighlighted={this.isPhase(RightPanelPhases.FilePanel)}
-                onClick={this.onFilesClicked}
-                analytics={['Right Panel', 'File List Button', 'click']}
-            />,
-            <HeaderButton key="notifsButton" name="notifsButton"
+            <HeaderButton
+                key="notifsButton"
+                name="notifsButton"
                 title={_t('Notifications')}
                 isHighlighted={this.isPhase(RightPanelPhases.NotificationPanel)}
                 onClick={this.onNotificationsClicked}
                 analytics={['Right Panel', 'Notification List Button', 'click']}
             />,
             meetingPanelButton,
+            <HeaderButton
+                key="roomSummaryButton"
+                name="roomSummaryButton"
+                title={_t('Room Info')}
+                isHighlighted={this.isPhase(ROOM_INFO_PHASES)}
+                onClick={this.onRoomSummaryClicked}
+                analytics={['Right Panel', 'Room Summary Button', 'click']}
+            />,
         ];
     }
 }

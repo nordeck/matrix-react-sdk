@@ -21,7 +21,7 @@ export default class MeetingPanel extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
-       this.state = {
+        this.state = {
             meetingsList: [],
         };
         this.getMeetingEventsList = this.getMeetingEventsList.bind(this);
@@ -31,7 +31,7 @@ export default class MeetingPanel extends React.Component<IProps, IState> {
 
     componentDidMount() {
         this.context.on('RoomState.events', this.onRoomStateEvents);
-         this.getMeetingEventsList();
+        this.getMeetingEventsList();
     }
 
     componentWillUnmount() {
@@ -45,14 +45,14 @@ export default class MeetingPanel extends React.Component<IProps, IState> {
         }
     }
 
-     onRoomStateEvents(stateEvent) {
+    onRoomStateEvents(stateEvent) {
         if (stateEvent.getType() === 'nic.meetings.meeting') {
             this.fillMeetingsList(stateEvent);
         }
     }
 
     getMeetingEventsList() {
-      const room = this.context.getRoom(this.props.roomId);
+        const room = this.context.getRoom(this.props.roomId);
         if (!room) return;
         const MeetingEvents = room.currentState.getStateEvents('nic.meetings.meeting');
         if (MeetingEvents.length !== 0) {
@@ -62,11 +62,13 @@ export default class MeetingPanel extends React.Component<IProps, IState> {
         }
     }
 
-     fillMeetingsList(meetingEvent) {
+    fillMeetingsList(meetingEvent) {
+        debugger;
         if (meetingEvent.getContent().parent_room_id === this.props.roomId) {
-            this.meetingsList = this.meetingsList.filter(meeting => meeting.meeting_id !== meetingEvent.getContent().meeting_id);
+            this.meetingsList = this.meetingsList.filter(
+                meeting => meeting.meeting_id !== meetingEvent.getContent().meeting_id);
             this.meetingsList.push(meetingEvent.getContent());
-           this.setState( {meetingsList: this.meetingsList });
+            this.setState( {meetingsList: this.meetingsList });
         }
     }
 

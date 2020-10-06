@@ -63,7 +63,6 @@ export default class MeetingPanel extends React.Component<IProps, IState> {
     }
 
     fillMeetingsList(meetingEvent) {
-        debugger;
         if (meetingEvent.getContent().parent_room_id === this.props.roomId) {
             this.meetingsList = this.meetingsList.filter(
                 meeting => meeting.meeting_id !== meetingEvent.getContent().meeting_id);

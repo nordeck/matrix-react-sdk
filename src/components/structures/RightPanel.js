@@ -301,7 +301,7 @@ export default class RightPanel extends React.Component {
                 panel = <WidgetCard room={this.props.room} widgetId={this.state.widgetId} onClose={this.onClose} />;
                 break;
             case RightPanelPhases.MeetingPanel:
-                panel = <MeetingPanel roomId={this.props.roomId} resizeNotifier={this.props.resizeNotifier} />;
+                panel = <MeetingPanel roomId={this.props.room.roomId} resizeNotifier={this.props.resizeNotifier} />;
                 break;
         }
 

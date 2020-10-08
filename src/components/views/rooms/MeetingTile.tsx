@@ -20,7 +20,6 @@ export default class MeetingTile extends React.Component<IProps> {
     }
 
     render() {
-        console.log(this);
         const meeting = this.props.meeting;
         const meetingStartTime = msToTime(meeting.start_time);
         const meetingEndTime = msToTime(meeting.end_time);

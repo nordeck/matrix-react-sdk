@@ -87,11 +87,10 @@ $dialog-background-bg-color: $header-panel-bg-color;
 $lightbox-background-bg-color: #000;
 
 $settings-grey-fg-color: #a2a2a2;
-$settings-profile-placeholder-bg-color: #e7e7e7;
-$settings-profile-overlay-bg-color: #000;
-$settings-profile-overlay-placeholder-bg-color: transparent;
-$settings-profile-overlay-fg-color: #fff;
+$settings-profile-placeholder-bg-color: #21262c;
 $settings-profile-overlay-placeholder-fg-color: #454545;
+$settings-profile-button-bg-color: #e7e7e7;
+$settings-profile-button-fg-color: $settings-profile-overlay-placeholder-fg-color;
 $settings-subsection-fg-color: $text-secondary-color;
 
 $topleftmenu-color: $text-primary-color;
@@ -118,6 +117,8 @@ $roomlist-filter-active-bg-color: $bg-color;
 $roomlist-bg-color: rgba(33, 38, 44, 0.90);
 $roomlist-header-color: $tertiary-fg-color;
 $roomsublist-divider-color: $primary-fg-color;
+
+$tagpanel-divider-color: $roomlist-header-color;
 
 $roomtile-preview-color: $secondary-fg-color;
 $roomtile-default-badge-bg-color: #61708b;

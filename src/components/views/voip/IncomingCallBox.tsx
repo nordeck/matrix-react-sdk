@@ -51,8 +51,8 @@ export default class IncomingCallBox extends React.Component<IProps, IState> {
 
     private onAction = (payload: ActionPayload) => {
         switch (payload.action) {
-            case 'call_state':
-                const call = CallHandler.getCall(payload.room_id);
+            case 'call_state': {
+                const call = CallHandler.sharedInstance().getCallForRoom(payload.room_id);
                 if (call && call.call_state === 'ringing') {
                     this.setState({
                         incomingCall: call,
@@ -62,6 +62,7 @@ export default class IncomingCallBox extends React.Component<IProps, IState> {
                         incomingCall: null,
                     });
                 }
+            }
         }
     };
 

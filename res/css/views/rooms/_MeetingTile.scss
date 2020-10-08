@@ -3,6 +3,12 @@
     border-radius: 0.5rem;
     overflow: hidden;
 }
+.mx_MeetingTile {
+    cursor: pointer;
+}
+.mx_MeetingTile:hover {
+    background-color: $other-user-pill-bg-color;
+}
 
 .mx_MeetingTile_Title {
     background-color: rgba(141, 151, 165, 0.2);
@@ -12,7 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    color: white;
+    color: $roomheader-color;
 }
 
 .mx_meetingTile_TimeContainer {
@@ -29,11 +35,11 @@
 }
 
 .mx_MeetingTile_Button {
-    color: white;
+    color: $rightpanel-button-color;
 }
 
 .mx_MeetingTile_verticalDivider {
-    background: white;
+    background: $roomsublist-divider-color;
     height: 2.5rem;
     width: 0.0625rem;
     margin: 0 1rem;
@@ -43,7 +49,7 @@
     height: 1.3rem;
     margin: 0 5px;
     border-radius: 1.3rem;
-    background-color: #ff4b55;
+    background-color: $mention-user-pill-bg-color;
     display: inline-block;
     display: -moz-inline-block;
 }

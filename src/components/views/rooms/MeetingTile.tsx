@@ -1,6 +1,7 @@
 import React from 'react';
 import { Meeting } from '../../../utils/Meeting';
 import MatrixClientContext from "../../../contexts/MatrixClientContext";
+import dis from "../../../dispatcher/dispatcher";
 
 function msToTime(input) {
     const date = new Date(input);
@@ -17,7 +18,21 @@ export default class MeetingTile extends React.Component<IProps> {
     static contextType = MatrixClientContext ;
     constructor(props: IProps) {
         super(props);
+        this.onMeetingTileClicked = this.onMeetingTileClicked.bind(this);
     }
+    onMeetingTileClicked(ev: React.MouseEvent) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const room = this.context.getRoom(this.props.meeting.room_id);
+        console.log('<<room on meeting clicked', this.props.meeting.room_id, this.props.meeting);
+        if (room) {
+            dis.dispatch({
+                action: 'view_room',
+                room_id: room.roomId,
+                show_room_tile: true, // to make sure the room gets scrolled into view
+            });
+        }
+    };
 
     render() {
         const meeting = this.props.meeting;
@@ -55,7 +70,7 @@ export default class MeetingTile extends React.Component<IProps> {
             </div>;
 
         return (
-            <div className='mx_MeetingTile'>
+            <div className='mx_MeetingTile' onClick={this.onMeetingTileClicked}>
                 { meetingTitle }
                 <div className='mx_MeetingTile_OverviewContainer'>
                     { dateContainer }

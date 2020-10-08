@@ -693,7 +693,7 @@ export default class RoomView extends React.Component<IProps, IState> {
                 this.checkIfAlone(this.state.room);
                 break;
             case 'confetti':
-                animateConfetti(this._roomView.current.offsetWidth);
+                animateConfetti(this.roomView.current.offsetWidth);
                 break;
             case 'post_sticker_message':
                 this.injectSticker(
@@ -807,15 +807,15 @@ export default class RoomView extends React.Component<IProps, IState> {
             }
         }
     };
-    onEventDecrypted(ev) {
+    onEventDecrypted = (ev) => {
         if (ev.isDecryptionFailure()) return;
         this.handleConfetti(ev);
-    },
-    onEvent(ev) {
+    };
+    onEvent = (ev) => {
         if (ev.isBeingDecrypted() || ev.isDecryptionFailure()) return;
         this.handleConfetti(ev);
-    },
-    handleConfetti(ev) {
+    };
+    handleConfetti = (ev) => {
         if (this.state.room.getUnreadNotificationCount() === 0) return;
         if (!SettingsStore.getValue('dontShowChatEffects')) {
             if (this.state.matrixClientIsReady) {
@@ -824,7 +824,7 @@ export default class RoomView extends React.Component<IProps, IState> {
                 }
             }
         }
-    },
+    };
 
     private onRoomName = (room: Room) => {
         if (this.state.room && room.roomId == this.state.room.roomId) {

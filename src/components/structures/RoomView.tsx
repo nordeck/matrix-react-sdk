@@ -71,7 +71,6 @@ import RoomHeader from "../views/rooms/RoomHeader";
 import TintableSvg from "../views/elements/TintableSvg";
 import {XOR} from "../../@types/common";
 import { IThreepidInvite } from "../../stores/ThreepidInviteStore";
-import {animateConfetti, forceStopConfetti, isConfettiEmoji} from "../views/elements/Confetti";
 
 const DEBUG = false;
 let debuglog = function(msg: string) {};
@@ -247,8 +246,6 @@ export default class RoomView extends React.Component<IProps, IState> {
         this.context.on("deviceVerificationChanged", this.onDeviceVerificationChanged);
         this.context.on("userTrustStatusChanged", this.onUserVerificationChanged);
         this.context.on("crossSigning.keysChanged", this.onCrossSigningKeysChanged);
-        this.context.on("Event.decrypted", this.onEventDecrypted);
-        this.context.on("event", this.onEvent);
         // Start listening for RoomViewStore updates
         this.roomStoreToken = RoomViewStore.addListener(this.onRoomViewStoreUpdate);
         this.rightPanelStoreToken = RightPanelStore.getSharedInstance().addListener(this.onRightPanelStoreUpdate);
@@ -569,8 +566,6 @@ export default class RoomView extends React.Component<IProps, IState> {
             this.context.removeListener("deviceVerificationChanged", this.onDeviceVerificationChanged);
             this.context.removeListener("userTrustStatusChanged", this.onUserVerificationChanged);
             this.context.removeListener("crossSigning.keysChanged", this.onCrossSigningKeysChanged);
-            this.context.removeListener("Event.decrypted", this.onEventDecrypted);
-            this.context.removeListener("event", this.onEvent);
         }
 
         window.removeEventListener('beforeunload', this.onPageUnload);
@@ -692,9 +687,6 @@ export default class RoomView extends React.Component<IProps, IState> {
             case 'message_sent':
                 this.checkIfAlone(this.state.room);
                 break;
-            case 'confetti':
-                animateConfetti(this.roomView.current.offsetWidth);
-                break;
             case 'post_sticker_message':
                 this.injectSticker(
                     payload.data.content.url,
@@ -807,24 +799,6 @@ export default class RoomView extends React.Component<IProps, IState> {
             }
         }
     };
-    onEventDecrypted = (ev) => {
-        if (ev.isDecryptionFailure()) return;
-        this.handleConfetti(ev);
-    };
-    onEvent = (ev) => {
-        if (ev.isBeingDecrypted() || ev.isDecryptionFailure()) return;
-        this.handleConfetti(ev);
-    };
-    handleConfetti = (ev) => {
-        if (this.state.room.getUnreadNotificationCount() === 0) return;
-        if (!SettingsStore.getValue('dontShowChatEffects')) {
-            if (this.state.matrixClientIsReady) {
-                if (isConfettiEmoji(ev.getContent()) || ev.getContent().msgtype === 'nic.custom.confetti') {
-                    dis.dispatch({action: 'confetti'});
-                }
-            }
-        }
-    };
 
     private onRoomName = (room: Room) => {
         if (this.state.room && room.roomId == this.state.room.roomId) {
@@ -854,7 +828,6 @@ export default class RoomView extends React.Component<IProps, IState> {
         this.calculateRecommendedVersion(room);
         this.updateE2EStatus(room);
         this.updatePermissions(room);
-        forceStopConfetti();
     };
 
     private async calculateRecommendedVersion(room: Room) {

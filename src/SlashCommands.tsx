@@ -1039,29 +1039,6 @@ export const Commands = [
         },
         category: CommandCategories.actions,
     }),
-    new Command({
-        command: "confetti",
-        description: _td("Sends the given message with confetti"),
-        args: '<message>',
-        runFn: function(roomId, args) {
-            return success((async () => {
-                if (!args) {
-                    args = _t("sends confetti") + " 🎉";
-                    MatrixClientPeg.get().sendEmoteMessage(roomId, args);
-                } else {
-                    const content = {
-                        msgtype: 'nic.custom.confetti',
-                        body: args,
-                    };
-                    MatrixClientPeg.get().sendMessage(roomId, content);
-                }
-                if (!SettingsStore.getValue('dontShowChatEffects')) {
-                    dis.dispatch({action: 'confetti'});
-                }
-            })());
-        },
-        category: CommandCategories.actions,
-    }),
 
     // Command definitions for autocompletion ONLY:
     // /me is special because its not handled by SlashCommands.js and is instead done inside the Composer classes

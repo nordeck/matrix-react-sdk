@@ -17,6 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { ICreateClientOpts } from 'matrix-js-sdk/src/matrix';
 import {MatrixClient} from 'matrix-js-sdk/src/client';
 import {MemoryStore} from 'matrix-js-sdk/src/store/memory';
 import * as utils from 'matrix-js-sdk/src/utils';
@@ -38,9 +39,9 @@ export interface IMatrixClientCreds {
     homeserverUrl: string;
     identityServerUrl: string;
     userId: string;
-    deviceId: string;
+    deviceId?: string;
     accessToken: string;
-    guest: boolean;
+    guest?: boolean;
     pickleKey?: string;
     freshLogin?: boolean;
 }
@@ -249,8 +250,7 @@ class _MatrixClientPeg implements IMatrixClientPeg {
     }
 
     private createClient(creds: IMatrixClientCreds): void {
-        // TODO: Make these opts typesafe with the js-sdk
-        const opts = {
+        const opts: ICreateClientOpts = {
             baseUrl: creds.homeserverUrl,
             idBaseUrl: creds.identityServerUrl,
             accessToken: creds.accessToken,

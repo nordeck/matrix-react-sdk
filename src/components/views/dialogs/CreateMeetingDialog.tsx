@@ -47,7 +47,7 @@ export default class CreateMeetingDialog extends React.Component<IProps, IState>
     private generateMeetingTitle = (): string => {
         const roomName = this.getParentRoom().name;
         const date = new Date(this.state.meetingDate);
-        return roomName + "-" + this.germanDate(date) + "-" + this.state.meetingTimeFrom;
+        return roomName + "-" + this.germanDate(date) + "-" + this.state.meetingTimeFrom.replace(':', ' Uhr ');
     }
 
     private isDM = (room_id: string): boolean => {

@@ -26,6 +26,7 @@ import {RightPanelPhases} from "../../../stores/RightPanelStorePhases";
 import {Action} from "../../../dispatcher/actions";
 import {ActionPayload} from "../../../dispatcher/payloads";
 import RightPanelStore from "../../../stores/RightPanelStore";
+import SettingsStore from "../../../settings/SettingsStore";
 
 const ROOM_INFO_PHASES = [
     RightPanelPhases.RoomSummary,
@@ -78,7 +79,20 @@ export default class RoomHeaderButtons extends HeaderButtons {
         this.setPhase(RightPanelPhases.NotificationPanel);
     };
 
+    private onMeetingsClicked = () => {
+        // This toggles for us, if needed
+        this.setPhase(RightPanelPhases.MeetingPanel);
+    }
+
     public renderButtons() {
+        const meetingPanelButton = SettingsStore.getValue('showMeetingPanelButton')
+            ? <HeaderButton key="meetingsButton" name="meetingsButton"
+                title={_t('Meetings')}
+                isHighlighted={this.isPhase(RightPanelPhases.MeetingPanel)}
+                onClick={this.onMeetingsClicked}
+                analytics={['Right Panel', 'Meeting History Button', 'click']} />
+            : null;
+
         return [
             <HeaderButton
                 key="notifsButton"
@@ -88,6 +102,7 @@ export default class RoomHeaderButtons extends HeaderButtons {
                 onClick={this.onNotificationsClicked}
                 analytics={['Right Panel', 'Notification List Button', 'click']}
             />,
+            meetingPanelButton,
             <HeaderButton
                 key="roomSummaryButton"
                 name="roomSummaryButton"

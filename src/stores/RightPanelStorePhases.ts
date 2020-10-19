@@ -22,6 +22,7 @@ export enum RightPanelPhases {
     NotificationPanel = 'NotificationPanel',
     RoomMemberInfo = 'RoomMemberInfo',
     EncryptionPanel = 'EncryptionPanel',
+    MeetingPanel = 'MeetingPanel',
     RoomSummary = 'RoomSummary',
     Widget = 'Widget',
 
@@ -42,4 +43,5 @@ export const RIGHT_PANEL_PHASES_NO_ARGS = [
     RightPanelPhases.RoomMemberList,
     RightPanelPhases.GroupMemberList,
     RightPanelPhases.GroupRoomList,
+    RightPanelPhases.MeetingPanel,
 ];

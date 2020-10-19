@@ -109,6 +109,9 @@ export default class RoomSublist extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
 
+        const allRooms = arrayFastClone(RoomListStore.instance.orderedLists[this.props.tagId] || []);
+        const filteredRooms = allRooms.filter(room => !RoomSublist.isMeeting(room));
+
         this.layout = RoomListLayoutStore.instance.getLayoutFor(this.props.tagId);
         this.heightAtStart = 0;
         this.isBeingFiltered = !!RoomListStore.instance.getFirstNameFilterCondition();
@@ -119,7 +122,7 @@ export default class RoomSublist extends React.Component<IProps, IState> {
             isResizing: false,
             isExpanded: this.isBeingFiltered ? this.isBeingFiltered : !this.layout.isCollapsed,
             height: 0, // to be fixed in a moment, we need `rooms` to calculate this.
-            rooms: arrayFastClone(RoomListStore.instance.orderedLists[this.props.tagId] || []),
+            rooms: filteredRooms,
         };
         // Why Object.assign() and not this.state.height? Because TypeScript says no.
         this.state = Object.assign(this.state, {height: this.calculateInitialHeight()});
@@ -257,9 +260,9 @@ export default class RoomSublist extends React.Component<IProps, IState> {
                 stateUpdates.filteredExtraTiles = null;
             }
         }
-
         const currentRooms = this.state.rooms;
-        const newRooms = arrayFastClone(RoomListStore.instance.orderedLists[this.props.tagId] || []);
+        const allNewRooms = arrayFastClone(RoomListStore.instance.orderedLists[this.props.tagId] || []);
+        const newRooms = allNewRooms.filter(room => !RoomSublist.isMeeting(room));
         if (arrayHasOrderChange(currentRooms, newRooms)) {
             stateUpdates.rooms = newRooms;
         }
@@ -505,6 +508,14 @@ export default class RoomSublist extends React.Component<IProps, IState> {
                 ev.stopPropagation();
         }
     };
+
+    private static isMeeting(room): boolean {
+        if (room && room.currentState.getStateEvents('m.room.create')[0]) {
+            return room.currentState.getStateEvents('m.room.create')[0].event.content.hasOwnProperty('meeting_id');
+        } else {
+            return false;
+        }
+    }
 
     private renderVisibleTiles(): React.ReactElement[] {
         if (!this.state.isExpanded) {

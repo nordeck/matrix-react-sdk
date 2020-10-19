@@ -1,0 +1,55 @@
+.mx_MeetingTile_Container {
+    border: 0.0625rem solid black;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.mx_MeetingTile {
+    cursor: pointer;
+}
+.mx_MeetingTile:hover {
+    background-color: $other-user-pill-bg-color;
+}
+
+.mx_MeetingTile_Title {
+    background-color: rgba(141, 151, 165, 0.2);
+}
+
+.mx_MeetingTile_OverviewContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: $roomheader-color;
+}
+
+.mx_meetingTile_TimeContainer {
+    text-align: end;
+}
+
+.mx_meetingTile_TimeContainer_Date {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.mx_meetingTile_TimeContainer_TimeSlot {
+    font-size: 1.25rem;
+}
+
+.mx_MeetingTile_Button {
+    color: $rightpanel-button-color;
+}
+
+.mx_MeetingTile_verticalDivider {
+    background: $roomsublist-divider-color;
+    height: 2.5rem;
+    width: 0.0625rem;
+    margin: 0 1rem;
+}
+.badge {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin: 0 5px;
+    border-radius: 1.3rem;
+    background-color: $mention-user-pill-bg-color;
+    display: inline-block;
+    display: -moz-inline-block;
+}

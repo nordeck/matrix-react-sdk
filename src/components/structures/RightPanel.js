@@ -17,6 +17,7 @@ limitations under the License.
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import {Room} from "matrix-js-sdk/src/models/room";
 
 import * as sdk from '../../index';
@@ -28,6 +29,7 @@ import {RightPanelPhases, RIGHT_PANEL_PHASES_NO_ARGS} from "../../stores/RightPa
 import RightPanelStore from "../../stores/RightPanelStore";
 import MatrixClientContext from "../../contexts/MatrixClientContext";
 import {Action} from "../../dispatcher/actions";
+import MeetingPanel from '../views/rooms/MeetingPanel';
 import RoomSummaryCard from "../views/right_panel/RoomSummaryCard";
 import WidgetCard from "../views/right_panel/WidgetCard";
 import defaultDispatcher from "../../dispatcher/dispatcher";
@@ -301,10 +303,19 @@ export default class RightPanel extends React.Component {
             case RightPanelPhases.Widget:
                 panel = <WidgetCard room={this.props.room} widgetId={this.state.widgetId} onClose={this.onClose} />;
                 break;
+            case RightPanelPhases.MeetingPanel:
+                panel = <MeetingPanel roomId={this.props.room.roomId} resizeNotifier={this.props.resizeNotifier} />;
+                break;
         }
 
+        const classes = classNames("mx_RightPanel", "mx_fadable", {
+            "collapsed": this.props.collapsed,
+            "mx_fadable_faded": this.props.disabled,
+            "dark-panel": true,
+        });
+
         return (
-            <aside className="mx_RightPanel dark-panel" id="mx_RightPanel">
+            <aside className={classes} id="mx_RightPanel">
                 { panel }
             </aside>
         );

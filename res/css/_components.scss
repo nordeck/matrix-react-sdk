@@ -15,6 +15,7 @@
 @import "./structures/_LeftPanel.scss";
 @import "./structures/_MainSplit.scss";
 @import "./structures/_MatrixChat.scss";
+@import "./structures/_MeetingButtons.scss";
 @import "./structures/_MyGroups.scss";
 @import "./structures/_NonUrgentToastContainer.scss";
 @import "./structures/_NotificationPanel.scss";
@@ -65,6 +66,7 @@
 @import "./views/dialogs/_ConfirmUserActionDialog.scss";
 @import "./views/dialogs/_CreateCommunityPrototypeDialog.scss";
 @import "./views/dialogs/_CreateGroupDialog.scss";
+@import "./views/dialogs/_CreateMeetingDialog.scss";
 @import "./views/dialogs/_CreateRoomDialog.scss";
 @import "./views/dialogs/_DeactivateAccountDialog.scss";
 @import "./views/dialogs/_DevtoolsDialog.scss";
@@ -175,6 +177,8 @@
 @import "./views/rooms/_IRCLayout.scss";
 @import "./views/rooms/_JumpToBottomButton.scss";
 @import "./views/rooms/_LinkPreviewWidget.scss";
+@import "./views/rooms/_MeetingPanel.scss";
+@import "./views/rooms/_MeetingTile.scss";
 @import "./views/rooms/_MemberInfo.scss";
 @import "./views/rooms/_MemberList.scss";
 @import "./views/rooms/_MessageComposer.scss";

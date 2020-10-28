@@ -13,7 +13,7 @@ export default class MeetingList extends React.Component<IProps> {
 
     render() {
         return (
-            <div>
+            <div className="mx_MeetingPanel_list">
                 { this.props.meetingList.sort(sortByStartingDate).map(entry => {
                     return <MeetingTile meeting={ entry } key={ entry.meeting_id } />
                 })}

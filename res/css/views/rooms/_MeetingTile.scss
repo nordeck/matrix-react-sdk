@@ -12,6 +12,7 @@
 
 .mx_MeetingTile_Title {
     background-color: rgba(141, 151, 165, 0.2);
+    padding: 0.5rem;
 }
 
 .mx_MeetingTile_OverviewContainer {
@@ -19,6 +20,7 @@
     align-items: center;
     justify-content: flex-end;
     color: $roomheader-color;
+    padding: 0 1rem;
 }
 
 .mx_meetingTile_TimeContainer {

@@ -21,37 +21,37 @@ export type FireworksOptions = {
     /**
      * max fireworks count
      */
-    maxCount: number,
+    maxCount: number;
     /**
      * gravity value that firework adds to shift from it's start position
      */
-    gravity: number,
+    gravity: number;
 }
 
 type FireworksParticle = {
     /**
      * color
      */
-    color: string,
+    color: string;
     /**
      * x,y are the point where the particle starts to position on canvas
      */
-    x: number,
-    y: number,
+    x: number;
+    y: number;
     /**
      * vx,vy shift values from x and y
      */
-    vx: number,
-    vy: number,
+    vx: number;
+    vy: number;
     /**
      * the alpha opacity of the firework particle (between 0 and 1, where 1 is opaque and 0 is invisible)
      */
-    alpha: number,
+    alpha: number;
     /**
      * w,h width and height
      */
-    w: number,
-    h: number
+    w: number;
+    h: number;
 }
 
 export const DefaultOptions: FireworksOptions = {
@@ -67,14 +67,11 @@ export default class Fireworks implements ICanvasEffect {
     }
 
     private context: CanvasRenderingContext2D | null = null;
-    private supportsAnimationFrame = window.requestAnimationFrame ||
-        function(callback) {
-            window.setTimeout(callback, 1000/60);
-        };
+    private supportsAnimationFrame = window.requestAnimationFrame;
     private particles: Array<FireworksParticle> = [];
     public isRunning: boolean;
 
-    public start = async (canvas: HTMLCanvasElement, timeout = 4000) => {
+    public start = async (canvas: HTMLCanvasElement, timeout = 3000) => {
         if (!canvas) {
             return;
         }
@@ -87,13 +84,14 @@ export default class Fireworks implements ICanvasEffect {
     }
 
     private updateWorld = () => {
-        if (!this.isRunning) return;
+        if (!this.isRunning && this.particles.length === 0) return;
         this.update();
         this.paint();
         this.supportsAnimationFrame.call(window, this.updateWorld);
     }
+
     private update = () => {
-        if (this.particles.length < this.options.maxCount) {
+        if (this.particles.length < this.options.maxCount && this.isRunning) {
             this.createFirework();
         }
         const alive = [];
@@ -144,8 +142,6 @@ export default class Fireworks implements ICanvasEffect {
 
     public stop = async () => {
         this.isRunning = false;
-        this.particles = [];
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     }
 
     private drawParticle = (particle: FireworksParticle): void => {

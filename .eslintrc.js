@@ -15,7 +15,6 @@ module.exports = {
         "prefer-promise-reject-errors": "off",
         "no-async-promise-executor": "off",
         "quotes": "off",
-        "indent": "off",
     },
 
     overrides: [{
@@ -31,6 +30,24 @@ module.exports = {
 
             "quotes": "off",
             "no-extra-boolean-cast": "off",
+            "no-restricted-properties": [
+                "error",
+                ...buildRestrictedPropertiesOptions(
+                    ["window.innerHeight", "window.innerWidth", "window.visualViewport"],
+                    "Use UIStore to access window dimensions instead",
+                ),
+            ],
         },
     }],
 };
+
+function buildRestrictedPropertiesOptions(properties, message) {
+    return properties.map(prop => {
+        const [object, property] = prop.split(".");
+        return {
+            object,
+            property,
+            message,
+        };
+    });
+}

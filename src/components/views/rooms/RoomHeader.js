@@ -27,11 +27,13 @@ import SettingsStore from "../../../settings/SettingsStore";
 import RoomHeaderButtons from '../right_panel/RoomHeaderButtons';
 import E2EIcon from './E2EIcon';
 import DecoratedRoomAvatar from "../avatars/DecoratedRoomAvatar";
-import {DefaultTagID} from "../../../stores/room-list/models";
 import AccessibleTooltipButton from "../elements/AccessibleTooltipButton";
 import RoomTopic from "../elements/RoomTopic";
 import RoomName from "../elements/RoomName";
+import {PlaceCallType} from "../../../CallHandler";
+import {replaceableComponent} from "../../../utils/replaceableComponent";
 
+@replaceableComponent("views.rooms.RoomHeader")
 export default class RoomHeader extends React.Component {
     static propTypes = {
         room: PropTypes.object,
@@ -45,6 +47,7 @@ export default class RoomHeader extends React.Component {
         e2eStatus: PropTypes.string,
         onAppsClick: PropTypes.func,
         appsShown: PropTypes.bool,
+        onCallPlaced: PropTypes.func, // (PlaceCallType) => void;
     };
 
     static defaultProps = {
@@ -173,7 +176,6 @@ export default class RoomHeader extends React.Component {
             roomAvatar = <DecoratedRoomAvatar
                 room={this.props.room}
                 avatarSize={32}
-                tag={DefaultTagID.Untagged} // to apply room publicity badging
                 oobData={this.props.oobData}
                 viewAvatarOnClick={true}
             />;
@@ -226,8 +228,26 @@ export default class RoomHeader extends React.Component {
                     title={_t("Search")} />;
         }
 
+        let voiceCallButton;
+        let videoCallButton;
+        if (this.props.inRoom && SettingsStore.getValue("showCallButtonsInComposer")) {
+            voiceCallButton =
+                <AccessibleTooltipButton
+                    className="mx_RoomHeader_button mx_RoomHeader_voiceCallButton"
+                    onClick={() => this.props.onCallPlaced(PlaceCallType.Voice)}
+                    title={_t("Voice call")} />;
+            videoCallButton =
+                <AccessibleTooltipButton
+                    className="mx_RoomHeader_button mx_RoomHeader_videoCallButton"
+                    onClick={(ev) => this.props.onCallPlaced(
+                        ev.shiftKey ? PlaceCallType.ScreenSharing : PlaceCallType.Video)}
+                    title={_t("Video call")} />;
+        }
+
         const rightRow =
             <div className="mx_RoomHeader_buttons">
+                { videoCallButton }
+                { voiceCallButton }
                 { pinnedEventsButton }
                 { forgetButton }
                 { appsButton }

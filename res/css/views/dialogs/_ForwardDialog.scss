@@ -34,7 +34,11 @@ limitations under the License.
     > .mx_ForwardDialog_preview {
         max-height: 30%;
         flex-shrink: 0;
-        overflow: scroll;
+        overflow-y: auto;
+
+        .mx_EventTile[data-layout=bubble] {
+            margin-top: 20px;
+        }
 
         div {
             pointer-events: none;

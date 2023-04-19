@@ -351,7 +351,12 @@ const SpotlightDialog: React.FC<IProps> = ({ initialText = "", initialFilter = n
             userIds.add(userId);
             return userIds;
         }, new Set<string>());
-        for (const user of [...findVisibleRoomMembers(cli, msc3946ProcessDynamicPredecessor), ...users]) {
+
+        const lcQuery = trimmedQuery.toLowerCase();
+        const members = findVisibleRoomMembers(cli);
+        const localUsers = members.filter((localResult) => [localResult.name, localResult.userId].some((q) => q.includes(lcQuery)));
+
+        for (const user of [...localUsers, ...users]) {
             // Make sure we don't have any user more than once
             if (alreadyAddedUserIds.has(user.userId)) continue;
             alreadyAddedUserIds.add(user.userId);
@@ -383,7 +388,7 @@ const SpotlightDialog: React.FC<IProps> = ({ initialText = "", initialFilter = n
             ),
             ...publicRooms.map(toPublicRoomResult),
         ].filter((result) => filter === null || result.filter.includes(filter));
-    }, [cli, users, profile, publicRooms, filter, msc3946ProcessDynamicPredecessor]);
+    }, [cli, users, profile, publicRooms, filter, msc3946ProcessDynamicPredecessor, trimmedQuery]);
 
     const results = useMemo<Record<Section, Result[]>>(() => {
         const results: Record<Section, Result[]> = {
@@ -408,7 +413,7 @@ const SpotlightDialog: React.FC<IProps> = ({ initialText = "", initialFilter = n
                     )
                         return; // bail, does not match query
                 } else if (isMemberResult(entry)) {
-                    if (!entry.query?.some((q) => q.includes(lcQuery))) return; // bail, does not match query
+                    // do-not-bail, homeserver might be matching search query on attributes the client does not know about
                 } else if (isPublicRoomResult(entry)) {
                     if (!entry.query?.some((q) => q.includes(lcQuery))) return; // bail, does not match query
                 } else {

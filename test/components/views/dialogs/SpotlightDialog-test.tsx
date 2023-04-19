@@ -449,4 +449,59 @@ describe("Spotlight Dialog", () => {
             expect(screen.getByText(potatoRoom.name!)).toBeInTheDocument();
         });
     });
+
+    describe("user directory non-matrix attributes", () => {
+        interface IUserExternalAttributesChunkMember extends IUserChunkMember {
+            location?: string;
+        }
+
+        const testPersonExternalAttributtes: IUserExternalAttributesChunkMember = {
+            user_id: "@earthling:matrix.org",
+            display_name: "Earth Person",
+            avatar_url: undefined,
+            location: "Earth", // this attribute could come from a matrix homeserver connected to LDAP
+        };
+
+        let mockedClient: MatrixClient;
+        beforeEach(() => {
+            const users: IUserExternalAttributesChunkMember[] = [testPersonExternalAttributtes]
+            mockedClient = mockClient({ rooms: [], users });
+            /* overwrite the function searchUserDirectory, to include non-matrix search attributes, used by the homeserver  */
+            mockedClient.searchUserDirectory = jest.fn(({ term, limit }) => {
+                const searchTerm = term?.toLowerCase();
+                const results = users.filter(
+                    (it) => {
+                        return (
+                            !searchTerm ||
+                            it.user_id.toLowerCase().includes(searchTerm) ||
+                            it.display_name?.toLowerCase().includes(searchTerm) ||
+                            it.location?.toLowerCase().includes(searchTerm)
+                        )
+                    }
+                );
+                return Promise.resolve({
+                    results: results.slice(0, limit ?? +Infinity),
+                    limited: !!limit && limit < results.length,
+                });
+            });
+        });
+
+        it("should display in results, persons with non-matrix attributes matching the search query", async () => {
+            render(
+                <SpotlightDialog
+                    initialFilter={Filter.People}
+                    initialText={testPersonExternalAttributtes.location}
+                    onFinished={() => null}
+                />
+            );
+
+            // search is debounced
+            jest.advanceTimersByTime(200);
+            await flushPromisesWithFakeTimers();
+
+            const options = document.querySelectorAll("div.mx_SpotlightDialog_option");
+            expect(options.length).toBeGreaterThanOrEqual(1);
+            expect(options[0]!.innerHTML).toContain(testPersonExternalAttributtes.display_name);
+        });
+    });
 });

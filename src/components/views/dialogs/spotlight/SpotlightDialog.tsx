@@ -47,6 +47,7 @@ import defaultDispatcher from "../../../../dispatcher/dispatcher";
 import { ViewRoomPayload } from "../../../../dispatcher/payloads/ViewRoomPayload";
 import { useDebouncedCallback } from "../../../../hooks/spotlight/useDebouncedCallback";
 import { useRecentSearches } from "../../../../hooks/spotlight/useRecentSearches";
+import { useWebSearchMetrics } from "../../../../hooks/spotlight/useWebSearchMetrics";
 import { useProfileInfo } from "../../../../hooks/useProfileInfo";
 import { usePublicRoomDirectory } from "../../../../hooks/usePublicRoomDirectory";
 import { useSpaceResults } from "../../../../hooks/useSpaceResults";
@@ -54,7 +55,6 @@ import { useUserDirectory } from "../../../../hooks/useUserDirectory";
 import { getKeyBindingsManager } from "../../../../KeyBindingsManager";
 import { _t } from "../../../../languageHandler";
 import { MatrixClientPeg } from "../../../../MatrixClientPeg";
-import { PosthogAnalytics } from "../../../../PosthogAnalytics";
 import { getCachedRoomIDForAlias } from "../../../../RoomAliasCache";
 import { showStartChatInviteDialog } from "../../../../RoomInvite";
 import { SettingLevel } from "../../../../settings/SettingLevel";
@@ -218,26 +218,6 @@ const toMemberResult = (member: Member | RoomMember): IMemberResult => ({
 });
 
 const recentAlgorithm = new RecentAlgorithm();
-
-export const useWebSearchMetrics = (numResults: number, queryLength: number, viaSpotlight: boolean): void => {
-    useEffect(() => {
-        if (!queryLength) return;
-
-        // send metrics after a 1s debounce
-        const timeoutId = window.setTimeout(() => {
-            PosthogAnalytics.instance.trackEvent<WebSearchEvent>({
-                eventName: "WebSearch",
-                viaSpotlight,
-                numResults,
-                queryLength,
-            });
-        }, 1000);
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
-    }, [numResults, queryLength, viaSpotlight]);
-};
 
 const findVisibleRooms = (cli: MatrixClient, msc3946ProcessDynamicPredecessor: boolean): Room[] => {
     return cli.getVisibleRooms(msc3946ProcessDynamicPredecessor).filter((room) => {
